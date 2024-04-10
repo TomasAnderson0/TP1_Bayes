@@ -1,4 +1,5 @@
 library(tidyverse)
+library(ggplot2)
 
 prob=c(.3,.55,.45)
 
@@ -24,6 +25,65 @@ mean(rowSums(datos))
 dates = sort(rowSums(datos))
 
 c(mean(dates[25], dates[26]), mean(dates[975], dates[976]))
+
+########################################################################
+#Random
+
+datos_random_dia=actualizar(366,1)
+
+ggplot(datos_random_dia)+
+  geom_line(aes(x=Dia, y = Maquina1Total, color="red"))+
+  geom_line(aes(x=Dia, y = Maquina2Total, color="blue"))+
+  geom_line(aes(x=Dia, y = Maquina3Total, color="green"))
+
+ggplot(datos_random_dia)+
+  geom_line(aes(x=Dia, y = Maquina1+Maquina2+Maquina3, color="red"))
+#to do: distribucion a posteriori
+
+datos=matrix(seq(0,1,.001),nrow = 1001)
+datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
+for (i in 1:6) {
+  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_random_dia$Maquina1[61*i],2-datos_random_dia$Maquina1[61*i]+datos_random_dia$Maquina1Total[61*i]))
+  }
+
+
+datos = as.data.frame(datos)
+colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
+                    "Dia366")
+
+col = rgb(0, 0, 1)
+
+
+ggplot(juju)+geom_line(aes(x=seq,y=Dia0,color=rgb(0.55, 0, 0)))+
+  geom_line(aes(x=seq,y=Dia61,color=rgb(0.8, 0, 0)))+
+  geom_line(aes(x=seq,y=Dia122))+
+  geom_line(aes(x=seq,y=Dia183))+
+  geom_line(aes(x=seq,y=Dia244))+
+  geom_line(aes(x=seq,y=Dia305))+
+  geom_line(aes(x=seq,y=Dia366))
+  
+
+
+
+
+
+
+
+datos_random_año=actualizar(366,1000)
+
+datos_random_filter=filter(datos_random_año, Dia == 366)
+
+Exitos_random_totales=rowSums(datos_random_filter[,3:5])
+
+hist(Exitos_random_totales)
+
+Media_random_totales=mean(Exitos_random_totales)
+
+Ordenados_random_totales = sort(Exitos_random_totales)
+
+Q_random_totales=c(mean(Ordenados_random_totales[25], Ordenados_random_totales[26]), 
+  mean(Ordenados_random_totales[975], Ordenados_random_totales[976]))
+
 
 
 ########################################################################
