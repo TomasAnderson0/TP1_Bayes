@@ -1,5 +1,5 @@
-library(tidyverse)
-library(ggplot2)
+  library(tidyverse)
+  library(ggplot2)
 
 prob=c(.3,.55,.45)
 
@@ -51,8 +51,6 @@ datos = as.data.frame(datos)
 colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
                     "Dia366")
 
-col = rgb(0, 0, 1)
-
 
 ggplot(juju)+geom_line(aes(x=seq,y=Dia0,color=rgb(0.55, 0, 0)))+
   geom_line(aes(x=seq,y=Dia61,color=rgb(0.8, 0, 0)))+
@@ -83,6 +81,8 @@ Ordenados_random_totales = sort(Exitos_random_totales)
 
 Q_random_totales=c(mean(Ordenados_random_totales[25], Ordenados_random_totales[26]), 
   mean(Ordenados_random_totales[975], Ordenados_random_totales[976]))
+
+
 
 
 

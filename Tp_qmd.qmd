@@ -1,0 +1,38 @@
+---
+title: "Trabajo practico 1"
+format: pdf
+editor: visual
+---
+
+
+## The Multiarmed Bandit
+
+Integrantes: Tomas Anderson, Alejo Vaschetti, Manuel Moresi
+Profesores: Tomas Capretto, Ignacio Evangelista
+Fecha de entrega: 17/04/2024
+
+## Introduccion
+
+La vida nos enfrenta constantemente a decisiones que nos obligan a equilibrar entre la seguridad de lo familiar y la promesa de lo desconocido, un dilema conocido como “explore vs. exploit”. Esta dicotomía, se manifiesta en una multitud de escenarios cotidianos. Por ejemplo, consideremos la elección de una cafetería para una merienda. ¿Optamos por un lugar al que hemos ido muchas veces, conocido por su calidad constante (‘exploit’), o probamos uno de los nuevos locales que abrieron en Rosario con el furor del café de especialidad que podría ofrecer una experiencia culinaria increíble o decepcionante (‘explore’)? Esta elección representa una encrucijada entre lo seguro y lo novedoso, entre el confort de lo familiar y la emoción de la novedad.
+
+Este dilema también se extiende a decisiones más significativas en nuestras vidas, como la elección de una carrera, donde ‘exploit’ implicaría seguir en un campo donde ya tenemos habilidades y experiencia, mientras que ‘explore’ nos llevaría a aventurarnos en un nuevo dominio, potencialmente más gratificante pero también más arriesgado. Esta tensión entre explorar y explotar no es solo una curiosidad teórica; es un principio fundamental que guía nuestras decisiones diarias. Navegar entre estas dos opciones requiere una comprensión profunda de nuestras metas, recursos y el entorno en el que operamos, y es una habilidad esencial para la adaptación y el éxito en un mundo en constante cambio.
+
+Estos párrafos de coaching emocional sirven como la introducción a este trabajo práctico, donde estudiaremos el problema del multi-armed bandit, que pone énfasis en el dilema “explore vs. exploit”. La traducción de multi-armed bandit es bandido multibrazo por lo que, por motivos obvios, nos quedaremos con la expresión en inglés.
+
+
+
+
+
+
+## Metodo
+
+```{r}
+library(tidyverse)
+library(ggplot2)
+```
+
+```{r}
+
+```
+
+The `echo: false` option disables the printing of code (only output is displayed).
