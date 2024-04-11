@@ -1,3 +1,12 @@
+# -------------- Cual Maximo ---------------------------------------------------
+cual_maximo = function(max_vec){
+  maximo = which(max(max_vec) == max_vec)
+  if (length(maximo) == 1) {
+    return(maximo)
+  } else {return(sample(maximo, 1))}
+}
+
+
 # -------------- Estrategia random ---------------------------------------------
 
 random = function(y, temp, e){

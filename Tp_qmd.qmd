@@ -8,7 +8,9 @@ editor: visual
 ## The Multiarmed Bandit
 
 Integrantes: Tomas Anderson, Alejo Vaschetti, Manuel Moresi
+
 Profesores: Tomas Capretto, Ignacio Evangelista
+
 Fecha de entrega: 17/04/2024
 
 ## Introduccion
@@ -19,7 +21,8 @@ To do
 
 ## Situacion ideal
 
-La situacion ideal seria conocer de antemano cual maquina es la que tiene la mayor probabilidad de ganar y jugar siempre en esta. Para que una estrategia sea buena, tiene que asemejarse a dicha situacion. 
+La situacion ideal seria conocer de antemano cual maquina es la que tiene la mayor probabilidad de ganar y jugar siempre con ella. Esta seria la mejor forma de jugar.
+Para que una estrategia sea buena, tiene que asemejarse a dicha situacion. 
 
 
 Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 1000 años utilizandolo. Estos fueron los resultados:
@@ -40,11 +43,9 @@ Esta estrategia consiste en elegir al azar la maquina a jugar en el dia, teniend
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-/3 lineas/
+/3 lineas/         /1 linea/
 
 Se jugo mas en la maquina 2, pero esto se debe a puro azar y no una decision meditada de la estrategia
-
-/1 linea/
 
 Las ganancias son bastante lineales
 
@@ -93,3 +94,10 @@ Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 100
 En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetarias en un año.
 
 El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
+
+
+
+
+
+
+
