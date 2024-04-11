@@ -1,8 +1,12 @@
+# -------------- Estrategia random ---------------------------------------------
+
 random = function(y, temp, e){
   cual = floor(runif(1,1,4))
   vector = c(rbinom(1, 1, prob[cual]), cual)
   return(vector)}
-########################################################################
+
+# ------------- Estrategia Softmax ---------------------------------------------
+
 softmax = function(tasas, temp, e){
   p = exp(tasas / temp) / sum(exp(tasas / temp))
   return(p)}
@@ -19,7 +23,8 @@ soft = function(y, temp, e){
   vector = c(rbinom(1, 1, prob[cual]), cual)
   return(vector)
 }
-########################################################################
+
+# ------------------------ Estrategia Thompson Sampling ------------------------
 
 thompson = function(y, temp, e){
   maquina1 = rbeta(1, 2 + y[1], 2 + y[4] - y[1])
@@ -30,7 +35,7 @@ thompson = function(y, temp, e){
   return(vector)
 }
 
-########################################################################
+# ------------------------ Estrategia Upper-Bound ------------------------------
 
 upper = function(y, temp, e){
   maquina1 = qbeta(.975, 2 + y[1], 2 + y[4] - y[1])
@@ -40,7 +45,9 @@ upper = function(y, temp, e){
   vector = c(rbinom(1, 1, prob[cual]), cual)
   return(vector)
 }
-########################################################################
+
+# ------------------------ Estrategia Greedy Prior -----------------------------
+
 greedy_prior = function(y, temp, e){
   maquina1 = (2 + y[1]) / (4 + y[4])
   maquina2 = (2 + y[2]) / (4 + y[5])
@@ -49,7 +56,9 @@ greedy_prior = function(y, temp, e){
   vector = c(rbinom(1, 1, prob[cual]), cual)
   return(vector)
 }
-########################################################################
+
+# ------------------------ Estrategia Greedy tasa ------------------------------
+
 greedy_tasa = function(y, temp, e){
   if (y[3] == 0) {
     if (y[2] == 0) {
@@ -68,11 +77,7 @@ greedy_tasa = function(y, temp, e){
   return(vector)
 }
 
-
-
-
-
-########################################################################
+# ------------------------- Estrategia E-Greedy --------------------------------
 
 e_greedy = function(y, temp, e){
   which = rbinom(1, 1, e)
@@ -83,9 +88,10 @@ e_greedy = function(y, temp, e){
     }
 }
 
+# ------------------------------------------------------------------------------
+# ------------------------- Función que converge las anteriores ----------------
+# ------------------------------------------------------------------------------
 
-
-########################################################################
 actualizar = function(dias = 366, muestras = 1, metodo = "random", temp = 1, e = .5){
   lista = list(random = random, greedy_tasa = greedy_tasa, greedy_prior = greedy_prior,
              e_greedy = e_greedy, softmax = soft, upper = upper, thompson = thompson)
