@@ -21,7 +21,24 @@ set.seed(69)
 
 datos = matrix(rbinom(366000, 1, prob[2]), nrow = 1000, ncol = 366, byrow = T)
 
-hist(rowSums(datos))
+ggplot()
+x=rowSums(datos)
+victor = as.data.frame(x)
+
+tema = theme(panel.grid = element_line(color = "lightgrey"),
+             panel.background = element_blank(),
+             axis.line = element_line(color = "black"))
+
+ggplot(victor,aes(x))+geom_histogram(fill = "#FF8F54", color = "black",binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)),name = "Frecuencia absoluta") +
+  scale_x_continuous(breaks = seq(168,232,8),name = "Unidades monetarias")+ tema
+ 
+
+
+
+
+
+
 
 mean(rowSums(datos))
 
@@ -277,8 +294,7 @@ thompson = function(y, temp, e){
 }
 
 ########################################################################
-qbeta(.975,6,13)
-qbeta(.975,18,7)
+
 
 upper = function(y, temp, e){
   maquina1 = qbeta(.975, 2 + y[1], 2 + y[4] - y[1])
@@ -352,7 +368,6 @@ actualizar=function(dias = 366,muestras = 1,metodo = "random", temp = 1, e = .5)
   return(datos)
 }
 
-datos=actualizar(366,1,"greedy_prior",1,.5)
 
 
 
