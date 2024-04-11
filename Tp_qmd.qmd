@@ -33,8 +33,63 @@ En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetar
 El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
 
 
-## Metodo
+## Estrategia 1: Completamente al azar
+
+Esta estrategia consiste en elegir al azar la maquina a jugar en el dia, teniendo las tres la misma probabilidad de ser elegidas. Esta es la estrategia mas basica, ya que no se actualiza ni requiere ningun tipo de informacion previa. 
+
+
+Se juega un año con esta estrategia y se obtienen los siguites resultados:
+
+/3 lineas/
+
+Se jugo mas en la maquina 2, pero esto se debe a puro azar y no una decision meditada de la estrategia
+
+/1 linea/
+
+Las ganancias son bastante lineales
+
+
+/posterior 1/           /posterior 2/                   /posterior 3/
+
+A traves del paso de los dias, el centro de las distribuciones a posteriori de las maquinas 1, 2 y 3 se van acercando a los valores "valor 1", "valor 2" y "valor 3"
 
 
 
+Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 1000 años utilizandolo. Estos fueron los resultados:
 
+/histograma/
+
+
+En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetarias en un año.
+
+El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
+
+## Estrategia 2: Greedy con tasa observada
+
+Esta estrategia seleccion la maquina a jugar en el dia a aquella que tenga la mayor probabilidad de ganar observada hasta el momento. Como al empezar el año no se tiene alguna informacion sobre la probabilidad de ganar de cada maquina, se decide jugar cada maquina por separado hasta que cada una tenga su primer exito.
+
+Se juega un año con esta estrategia y se obtienen los siguites resultados:
+
+/3 lineas/
+
+Se "jugo" casi exclusivamente la maquina "x" y se ignoro a las otras 2
+
+/1 linea/
+
+Las ganancias son bastante lineales
+
+
+/posterior 1/           /posterior 2/                   /posterior 3/
+
+A traves del paso de los dias, el centro de las distribucion a posteriori de la maquina "x" se va acercando al valor "valor 1" y las otras maquinas tienen las mismas distribuciones a posteriori en todos los dias observados porque desde antes del dia 61 se dejaron de usar.
+
+
+
+Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 1000 años utilizandolo. Estos fueron los resultados:
+
+/histograma/
+
+
+En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetarias en un año.
+
+El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
