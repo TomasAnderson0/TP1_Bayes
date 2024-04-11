@@ -14,6 +14,9 @@ cual_maximo = function(max_vec){
 
 ########################################################################
 
+set.seed(69)
+
+
 #Punto 1
 
 datos = matrix(rbinom(366000, 1, prob[2]), nrow = 1000, ncol = 366, byrow = T)
