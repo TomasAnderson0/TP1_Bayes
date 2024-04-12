@@ -4,7 +4,6 @@ format: pdf
 editor: visual
 ---
 
-
 ## The Multiarmed Bandit
 
 Integrantes: Tomas Anderson, Alejo Vaschetti, Manuel Moresi
@@ -13,91 +12,81 @@ Profesores: Tomas Capretto, Ignacio Evangelista
 
 Fecha de entrega: 17/04/2024
 
+\newpage
+
 ## Introduccion
 
 To do
 
 # Desarrollo
 
-## Situacion ideal
+## Situación ideal
 
-La situacion ideal seria conocer de antemano cual maquina es la que tiene la mayor probabilidad de ganar y jugar siempre con ella. Esta seria la mejor forma de jugar.
-Para que una estrategia sea buena, tiene que asemejarse a dicha situacion. 
+La situación ideal seria conocer de antemano cual máquina es la que tiene la mayor probabilidad de ganar y jugar siempre con ella. Esta sería la mejor forma de ganar dinero, por lo que una buena estrategia tiene que asemejarse a dicha situación.
 
-
-Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 1000 años utilizandolo. Estos fueron los resultados:
-
+Para ver la cantidad de dinero que gana en promedio este método se simulan a 1000 personas jugando 1 año utilizándolo. Estos fueron los resultados:
 
 /histograma/
 
+En este modus operandi una persona que juege un año se espera que va a ganar alrededor de "201.986" unidades monetarias. En el 95% de los años simulados las ganancias totales se encontraron entre "184" y "220" unidades monetarias. Dicho intervalo, y los que seran presentados en las próximas estrategias, se encuentran entre el 2,5% y el 97,5% de las ganancias totales del método ordenadas de menor a mayor.
 
-En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetarias en un año.
-
-El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
-
+Para ver que tan beneficioso es cada estrategia, se comparan la cantidad de veces que se gana en promedio esperando que se acerque lo máximo posible a esta forma de jugar. Además, se contrastan los límites de los intervalos propuestos.
 
 ## Estrategia 1: Completamente al azar
 
-Esta estrategia consiste en elegir al azar la maquina a jugar en el dia, teniendo las tres la misma probabilidad de ser elegidas. Esta es la estrategia mas basica, ya que no se actualiza ni requiere ningun tipo de informacion previa. 
-
+Esta estrategia consiste en elegir cada día al azar qué máquina jugar, teniendo las tres la misma probabilidad de ser selectas. Esta es la estrategia mas basica, ya que no requiere ningun tipo de informacion previa ni evoluciona en el tiempo.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-/3 lineas/         /1 linea/
+/3 lineas/ /1 linea/
 
-Se jugo mas en la maquina 2, pero esto se debe a puro azar y no una decision meditada de la estrategia
+La cantidad de veces que se juegan las 3 máquinas son similares, y la diferencia entre ellas se debe puramente al azar. Este hecho impacta en la evolución de la credibilidad sobre la probabilidad de éxito de cada máquina, como se ve a continuación.
 
-Las ganancias son bastante lineales
+/posterior 1/ /posterior 2/ /posterior 3/
 
-
-/posterior 1/           /posterior 2/                   /posterior 3/
-
-A traves del paso de los dias, el centro de las distribuciones a posteriori de las maquinas 1, 2 y 3 se van acercando a los valores "valor 1", "valor 2" y "valor 3"
+Al jugarse una cantidad similar de veces en cada máquina la credibilidad se concentra en igual medida alrededor de los valores de las probabilidades de éxito de cada una.
+Estos son "valor 1", "valor 2" y "valor 3" para la máquina 1, 2 y 3 respectivamente.
 
 
 
-Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 1000 años utilizandolo. Estos fueron los resultados:
+Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
 /histograma/
 
+En promedio, siguiendo esta estrategia, se espera ganar "158.609" unidades monetarias en un año.
 
-En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetarias en un año.
+El 95% de las ganancias al final del año estuvieron entre "140" y "178".
 
-El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
+El promedio de ganancias al fianl del año es sustancialmente mas chico que el de la situacion ideal y los intervalos siquiera se superponen. Se puede pensar que esta estrategia no es recomendable al diferir tanto de un resultado ideal.
+
+
 
 ## Estrategia 2: Greedy con tasa observada
 
-Esta estrategia seleccion la maquina a jugar en el dia a aquella que tenga la mayor probabilidad de ganar observada hasta el momento. Como al empezar el año no se tiene alguna informacion sobre la probabilidad de ganar de cada maquina, se decide jugar cada maquina por separado hasta que cada una tenga su primer exito.
+La maquina que esta estrategia selecciona en un cierto dia es aquella que tenga la mayor probabilidad de éxito observada hasta el momento. Como al empezar el año no se tiene ninguna informacion sobre la probabilidad de éxito de cada maquina, se decide jugar cada una por separado hasta todas tengan su primer éxito.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-/3 lineas/
+/3 lineas/  /1 linea/
 
-Se "jugo" casi exclusivamente la maquina "x" y se ignoro a las otras 2
-
-/1 linea/
-
-Las ganancias son bastante lineales
+En este año se usa casi exclusivamente la maquina "x" y apenas se utilizan las otras dos. Esto pasa porque las probabilidades de exitos iniciales observadas son muy variables, por lo que la primera maquina en tener varios fracasos va a tener una probabilidad muy chica y se dejara de usar. Esto impacta a la credibilidad sobre la probabilidad de éxito de cada máquina de la siguiente manera.
 
 
-/posterior 1/           /posterior 2/                   /posterior 3/
+/posterior 1/ /posterior 2/ /posterior 3/
 
-A traves del paso de los dias, el centro de las distribucion a posteriori de la maquina "x" se va acercando al valor "valor 1" y las otras maquinas tienen las mismas distribuciones a posteriori en todos los dias observados porque desde antes del dia 61 se dejaron de usar.
+La credibilidad sobre la probabilidad de exito de la maquina "x" va a ser muy precisa, al tener muchas muestras de ella, y las demas seran poco precisas y muy parecidas a nuestra creencia inical.
+
+Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
 
-
-Para ver la cantidad de dinero que gana en promedio este "metodo" se simulan 1000 años utilizandolo. Estos fueron los resultados:
+/tabla/ promedio de cant de veces que se usa cada maquina
 
 /histograma/
 
 
-En promedio, siguiendo este metodo, se espera que ganan "valor" unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar "valor" unidades monetarias en un año.
 
-El 95% de las ganancias al final del año estuvieron entre "valor" y "valor". 
+El 95% de las ganancias al final del año estuvieron entre "valor" y "valor".
 
-
-
-
-
-
+Si bien es un metodo que puede generar mucha ganancia, al usar la mejor maquina mayoritariamente, es arriesgado porque hay una probabilidad de usar por el año entero la peor maquina posible.
 
