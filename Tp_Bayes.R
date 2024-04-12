@@ -74,15 +74,13 @@ ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
   geom_line(aes(x=seq,y=Dia244,color="Dia 244"))+
   geom_line(aes(x=seq,y=Dia305,color="Dia 305"))+
   geom_line(aes(x=seq,y=Dia366, color ="Dia 366"))+
-  scale_color_manual(values=colores)+
   tema+
   scale_y_continuous(name="Credibilidad")+
   theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
-  scale_x_continuous(name="Probabilidad de éxito")+
-  scale_fill_discrete(breaks=c("Dia 0", "Dia 61", "Dia 122", '"Dia 183"', "Dia 244","Dia 305","Dia 366"))
-
-
-#Maquina 2
+  scale_x_continuous(name="Probabilidad de éxito") +
+  scale_color_discrete(breaks=c("Dia 0", "Dia 61", "Dia 122", "Dia 183", "Dia 244","Dia 305","Dia 366"),type=colores)
+  
+  #Maquina 2
 datos=matrix(seq(0,1,.001),nrow = 1001)
 datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
 for (i in 1:6) {
