@@ -22,7 +22,7 @@ To do
 
 Cosas que se corren siempre
 
-```{r}
+```{r, message=FALSE, echo=FALSE, error=FALSE, warning=FALSE}
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
@@ -41,7 +41,7 @@ La situación ideal seria conocer de antemano cual máquina es la que tiene la m
 
 Para ver la cantidad de dinero que gana en promedio este método se simulan a 1000 personas jugando 1 año utilizándolo. Estos fueron los resultados:
 
-```{r, echo=FALSE,message=FALSE,warning=FALSE}
+```{r, message=FALSE, echo=FALSE, error=FALSE, warning=FALSE}
 set.seed(69)
 datos = matrix(rbinom(366000, 1, prob[2]), nrow = 1000, ncol = 366, byrow = T)
 ideal = as.data.frame(rowSums(datos))
@@ -68,7 +68,7 @@ Esta estrategia consiste en elegir cada día al azar qué máquina jugar, tenien
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r}
+```{r, message=FALSE, echo=FALSE, error=FALSE, warning=FALSE}
 set.seed(69)
 
 datos_random_dia = actualizar(366, 1)
@@ -82,7 +82,7 @@ plot1_random_dia = ggplot(datos_random_dia)+
   scale_x_continuous(name="Dias",breaks = seq(0, 366, 61)) +
   scale_color_discrete(breaks=c("Maquina 1", "Maquina 2", "Maquina 3"),type = c("purple", "green","blue"),name = "")+
   theme(plot.margin = margin(1.5,.3,1.5,.3, "cm"))+
-  theme(legend.position = c(.25,.75),legend.background = element_blank())
+  theme(legend.position = c(.25,.85),legend.background = element_blank(),legend.key = element_blank())
 
 
 plot2_random_dia = ggplot(datos_random_dia)+
@@ -99,7 +99,7 @@ grid.arrange(plot1_random_dia, plot2_random_dia, ncol=2)
 
 La cantidad de veces que se juegan las 3 máquinas son similares, y la diferencia entre ellas se debe puramente al azar. Este hecho impacta en la evolución de la credibilidad sobre la probabilidad de éxito de cada máquina, como se ve a continuación.
 
-```{r}
+```{r, message=FALSE, echo=FALSE, error=FALSE, warning=FALSE}
 set.seed(69)
 datos_random_post=matrix(seq(0,1,.001),nrow = 3003)
 datos_random_post=cbind(datos_random_post,dbeta(seq(0,1,.001),2,2))
@@ -138,13 +138,14 @@ plot3_random_dia=ggplot(datos_random_post, aes(col=factor(Maquina))) +
   scale_x_continuous(name="Probabilidad de éxito",breaks = seq(0,1,.25)) +
   scale_color_discrete(breaks=c("Dia 0","Dia 244", "Dia 61", "Dia 305", "Dia 122", "Dia 366", "Dia 183"), type = colores, name="")+
   theme(legend.background = element_blank(), legend.key.height = unit(.1,"cm"),plot.margin = margin(1,.01,1,.01, "cm"),legend.position = "top",)+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 6),axis.text.y = element_text(size = 6))
+  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 6))
 
 plot3_random_dia
 
 
-
-
+Pb_random_1 = (2+datos_random_dia$Maquina1[366])/(4+datos_random_dia$Maquina1Total[366])
+Pb_random_2 =(2+datos_random_dia$Maquina2[366])/(4+datos_random_dia$Maquina2Total[366])
+Pb_random_3 =(2+datos_random_dia$Maquina3[366])/(4+datos_random_dia$Maquina3Total[366])
 
 
 
@@ -153,15 +154,38 @@ plot3_random_dia
 
 /posterior 1/ /posterior 2/ /posterior 3/
 
-Al jugarse una cantidad similar de veces en cada máquina la credibilidad se concentra en igual medida alrededor de los valores de las probabilidades de éxito de cada una. Estos son "valor 1", "valor 2" y "valor 3" para la máquina 1, 2 y 3 respectivamente.
+Al jugarse una cantidad similar de veces en cada máquina la credibilidad se concentra en igual medida alrededor de los valores de las probabilidades de éxito de cada una. Estos son `r Pb_random_1`, `r Pb_random_2` y `r Pb_random_3` para la máquina 1, 2 y 3 respectivamente.
 
 Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
+```{r}
+set.seed(69)
+
+datos_random_año = actualizar(366,1000)
+
+datos_random_filter = filter(datos_random_año, Dia == 366)
+
+Exitos_random_totales=as.data.frame(rowSums(datos_random_filter[,3:5]))
+colnames(Exitos_random_totales)="x"
+
+ggplot(Exitos_random_totales,aes(x))+geom_histogram(fill = "#FF8F54", color = "black",binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)),name = "Frecuencia absoluta") +
+  scale_x_continuous(breaks = seq(128,192,8),name = "Unidades monetarias")+ tema
+
+Media_random = mean(Exitos_random_totales$x)
+
+Q_random = sort(Exitos_random_totales$x)
+
+Q_random_int=c(mean(Q_random[25], Q_random[26]), 
+  mean(Q_random[975], Q_random[976]))
+```
+
+
 /histograma/
 
-En promedio, siguiendo esta estrategia, se espera ganar "158.609" unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_random` unidades monetarias en un año.
 
-El 95% de las ganancias al final del año estuvieron entre "140" y "178".
+El 95% de las ganancias al final del año estuvieron entre `r Q_random_int[1]` y `r Q_random_int[2]`.
 
 El promedio de ganancias al fianl del año es sustancialmente mas chico que el de la situacion ideal y los intervalos siquiera se superponen. Se puede pensar que esta estrategia no es recomendable al diferir tanto de un resultado ideal.
 
