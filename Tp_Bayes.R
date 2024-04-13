@@ -8,12 +8,15 @@ prob=c(.3,.55,.45)
 
 
 
-set.seed(69)
+
 
 
 
 
 #Punto 1
+
+
+set.seed(69)
 
 datos = matrix(rbinom(366000, 1, prob[2]), nrow = 1000, ncol = 366, byrow = T)
 
@@ -45,6 +48,8 @@ c(mean(dates[25], dates[26]), mean(dates[975], dates[976]))
 ########################################################################
 #Random
 
+set.seed(69)
+
 datos_random_dia=actualizar(366,1)
 
 ggplot(datos_random_dia)+
@@ -64,21 +69,33 @@ ggplot(datos_random_dia)+
 
 
 #Maquina 1
-datos=matrix(seq(0,1,.001),nrow = 1001)
-datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
+
+set.seed(69)
+datos_random_post=matrix(seq(0,1,.001),nrow = 3003)
+datos_random_post=cbind(datos_random_post,dbeta(seq(0,1,.001),2,2))
+Maquina1_random = matrix(nrow = 1001,ncol = 6)
+Maquina2_random = matrix(nrow = 1001,ncol = 6)
+Maquina3_random = matrix(nrow = 1001,ncol = 6)
+
 for (i in 1:6) {
-  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_random_dia$Maquina1[61*i],2-datos_random_dia$Maquina1[61*i]+datos_random_dia$Maquina1Total[61*i]))
-  }
+  Maquina1_random[,i] = matrix(dbeta(seq(0,1,.001),2+datos_random_dia$Maquina1[61*i],2-datos_random_dia$Maquina1[61*i]+datos_random_dia$Maquina1Total[61*i]))
+  Maquina2_random[,i] = matrix(dbeta(seq(0,1,.001),2+datos_random_dia$Maquina2[61*i],2-datos_random_dia$Maquina2[61*i]+datos_random_dia$Maquina2Total[61*i]))
+  Maquina3_random[,i] = matrix(dbeta(seq(0,1,.001),2+datos_random_dia$Maquina3[61*i],2-datos_random_dia$Maquina3[61*i]+datos_random_dia$Maquina3Total[61*i]))
+  
+}
 
-
-datos = as.data.frame(datos)
-colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
-                    "Dia366")
+Maquinas_random = rbind(Maquina1_random,Maquina2_random,Maquina3_random)
+Maquinas_random = cbind(Maquinas_random,matrix(rep(1:3, each = 1001),nrow = 3003,ncol = 1))
+datos_random_post = cbind(datos_random_post,Maquinas_random)
+datos_random_post = as.data.frame(datos_random_post)
+colnames(datos_random_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
+                    "Dia366","Maquina")
 
 colores=c("#ffe500","#ffa200","#ff8000","#ff5500","#ff3600","#ff0000","#ffc500")
 
+Maquina1_random = filter(datos_random_post, Maquina == 1)
 
-ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
+ggplot(Maquina1_random)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
   geom_line(aes(x=seq,y=Dia61,color="Dia 61"))+
   geom_line(aes(x=seq,y=Dia122,color="Dia 122"))+
   geom_line(aes(x=seq,y=Dia183,color="Dia 183"))+
@@ -92,18 +109,11 @@ ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
   scale_color_discrete(breaks=c("Dia 0", "Dia 61", "Dia 122", "Dia 183", "Dia 244","Dia 305","Dia 366"),type=colores,name="Días")
   
   #Maquina 2
-datos=matrix(seq(0,1,.001),nrow = 1001)
-datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
-for (i in 1:6) {
-  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_random_dia$Maquina2[61*i],2-datos_random_dia$Maquina2[61*i]+datos_random_dia$Maquina2Total[61*i]))
-}
+
+Maquina2_random = filter(datos_random_post, Maquina == 2)
 
 
-datos = as.data.frame(datos)
-colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
-                    "Dia366")
-
-ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
+ggplot(Maquina2_random)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
   geom_line(aes(x=seq,y=Dia61,color="Dia 61"))+
   geom_line(aes(x=seq,y=Dia122,color="Dia 122"))+
   geom_line(aes(x=seq,y=Dia183,color="Dia 183"))+
@@ -118,18 +128,11 @@ ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
 
 
 #Maquina 3
-datos=matrix(seq(0,1,.001),nrow = 1001)
-datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
-for (i in 1:6) {
-  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_random_dia$Maquina3[61*i],2-datos_random_dia$Maquina3[61*i]+datos_random_dia$Maquina3Total[61*i]))
-}
 
 
-datos = as.data.frame(datos)
-colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
-                    "Dia366")
+Maquina3_random = filter(datos_random_post, Maquina == 3)
 
-ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
+ggplot(Maquina3_random)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
   geom_line(aes(x=seq,y=Dia61,color="Dia 61"))+
   geom_line(aes(x=seq,y=Dia122,color="Dia 122"))+
   geom_line(aes(x=seq,y=Dia183,color="Dia 183"))+
@@ -146,12 +149,11 @@ ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
 
 
 
+set.seed(69)
 
+datos_random_año = actualizar(366,1000)
 
-
-datos_random_año=actualizar(366,1000)
-
-datos_random_filter=filter(datos_random_año, Dia == 366)
+datos_random_filter = filter(datos_random_año, Dia == 366)
 
 Exitos_random_totales=as.data.frame(rowSums(datos_random_filter[,3:5]))
 colnames(Exitos_random_totales)="x"
