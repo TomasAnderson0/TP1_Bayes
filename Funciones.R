@@ -55,9 +55,9 @@ upper = function(y, temp, e){
   return(vector)
 }
 
-# ------------------------ Estrategia Greedy Prior -----------------------------
+# ------------------------ Estrategia Greedy Posterior -------------------------
 
-greedy_prior = function(y, temp, e){
+greedy_posterior = function(y, temp, e){
   maquina1 = (2 + y[1]) / (4 + y[4])
   maquina2 = (2 + y[2]) / (4 + y[5])
   maquina3 = (2 + y[3]) / (4 + y[6])
@@ -69,18 +69,18 @@ greedy_prior = function(y, temp, e){
 # ------------------------ Estrategia Greedy tasa ------------------------------
 
 greedy_tasa = function(y, temp, e){
-  if (y[3] == 0) {
-    if (y[2] == 0) {
-      if (y[1] == 0) {
-        vector = c(rbinom(1, 1, prob[1]), 1)
-        return(vector)
-      }
-      vector = c(rbinom(1, 1, prob[2]), 2)
-      return(vector)
-    }
-    vector = c(rbinom(1, 1, prob[3]), 3)
+  if (y[1] == 0) {
+    vector = c(rbinom(1, 1, prob[1]), 1)
     return(vector)
   }
+  if (y[2] == 0) {
+    vector = c(rbinom(1, 1, prob[2]), 2)
+    return(vector)
+  }
+  if (y[3] == 0) {
+    vector = c(rbinom(1, 1, prob[3]), 3)
+    return(vector)
+  }   
   cual = cual_maximo(c(y[1:3]) / c(y[4:6]))
   vector = c(rbinom(1, 1, prob[cual]), cual)
   return(vector)
@@ -91,9 +91,9 @@ greedy_tasa = function(y, temp, e){
 e_greedy = function(y, temp, e){
   which = rbinom(1, 1, e)
   if (which == 1) {
-    greedy_tasa(y)
+    return(greedy_tasa(y, temp ,e))
   } else {
-    random(y)
+    return(random(y, temp, e))
     }
 }
 
@@ -102,7 +102,7 @@ e_greedy = function(y, temp, e){
 # ------------------------------------------------------------------------------
 
 actualizar = function(dias = 366, muestras = 1, metodo = "random", temp = 1, e = .5){
-  lista = list(random = random, greedy_tasa = greedy_tasa, greedy_prior = greedy_prior,
+  lista = list(random = random, greedy_tasa = greedy_tasa, greedy_posterior = greedy_posterior,
              e_greedy = e_greedy, softmax = soft, upper = upper, thompson = thompson)
   metodo = lista[[metodo]]
   matriz = matrix(0, dias*muestras, 10)
