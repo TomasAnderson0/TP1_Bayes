@@ -5,10 +5,45 @@ source("Funciones.R")
 
 
 prob=c(.3,.55,.45)
+set.seed(69)
+
+
+
+datos_e_greedy_año = actualizar(366, 1000, "e_greedy", e = epsilon)
+
+datos_e_greedy_filter = filter(datos_e_greedy_año, Dia == 366)
+
+Exitos_e_greedy_totales = as.data.frame(rowSums(datos_e_greedy_filter[, 3:5]))
+colnames(Exitos_e_greedy_totales) = "x"
+
+
+ggplot(Exitos_e_greedy_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 150), breaks = seq(0, 150, 25)) +
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+
+Media_e_greedy = mean(Exitos_e_greedy_totales$x)
+
+Q_e_greedy = sort(Exitos_e_greedy_totales$x)
+
+Q_e_greedy_int = c(mean(Q_e_greedy[25], Q_e_greedy[26]), mean(Q_e_greedy[975], Q_e_greedy[976]))
 
 
 
 
+
+xxx=matrix(seq(0,1,.01),nrow = 101)
+xxx=cbind(xxx,0)
+
+matrix(lista[[1]],nrow = 366000,ncol = 12)
+
+for (i in 0:100) {
+  datos=filter(lista[i+1], Dia == 366)
+  xxx[i+1,2]= sum(datos[,3:5])
+}
+
+hist(xxx)
+
+mean()
 
 
 
