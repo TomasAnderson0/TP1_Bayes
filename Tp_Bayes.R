@@ -8,6 +8,36 @@ prob=c(.3,.55,.45)
 set.seed(69)
 
 
+vector = data.frame(matrix(nrow = 101,ncol = 3))
+
+matriz = actualizar(366, 1000, "e_greedy", e = 1)
+
+for (i in 0:100) {
+  matriz = actualizar(366, 1000, "e_greedy", e = i/100)
+  matriz = filter(matriz, Dia == 366)
+  matriz = matriz[, 6:8]
+  vector[i,] = colMeans(matriz)
+}
+
+
+vector
+
+xxx=rbind(as.matrix(vector[1:100,1]),as.matrix(vector[1:100,2]),as.matrix(vector[1:100,3]))
+xxx=as.data.frame(cbind(xxx,rep(c(1,2,3), each = 100),seq(0,.99,.01)))
+colnames(xxx) = c("x","Maquina","seq")
+
+
+ggplot(xxx)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+tema+
+  scale_y_continuous(name="Cantidad de veces promedio jugadas",breaks = seq(0,280,40),limits = c(0,280))+
+  scale_x_continuous(name="Epsilon",breaks = seq(0,1,.1)) +
+  scale_color_discrete(type=c("purple", "green","blue"),name = "", labels = c("Maquina 1","Maquina 2", "Maquina 3" ))+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
+  theme(legend.position = c(.15,.85), legend.background = element_blank(), legend.key = element_blank())
+
+
+
+
+
 
 datos_e_greedy_año = actualizar(366, 1000, "e_greedy", e = epsilon)
 
