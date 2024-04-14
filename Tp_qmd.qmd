@@ -52,7 +52,8 @@ colnames(ideal) = "x"
 
 ggplot(ideal, aes(x))+geom_histogram(fill = "#FF8F54", color = "black",binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,175), breaks = seq(0,175,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(168,232,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(168,232,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_ideal = mean(rowSums(datos))
 Q_ideal = sort(rowSums(datos))
@@ -167,7 +168,8 @@ colnames(Exitos_random_totales) = "x"
 
 ggplot(Exitos_random_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), breaks = seq(0,175,25), limits = c(0,175), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(128,192,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(128,192,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_random = round(mean(Exitos_random_totales$x),2)
 
@@ -295,7 +297,8 @@ colnames(Exitos_greedy_tasa_totales) = "x"
 
 ggplot(Exitos_greedy_tasa_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,125), breaks = seq(0,125,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(96,232,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(96,232,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_greedy_tasa = round(mean(Exitos_greedy_tasa_totales$x),2)
 
@@ -425,7 +428,8 @@ colnames(Exitos_greedy_posterior_totales) = "x"
 
 ggplot(Exitos_greedy_posterior_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 125)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_greedy_posterior = round(mean(Exitos_greedy_posterior_totales$x),2)
 
@@ -463,16 +467,43 @@ kable(round(med_greedy_posterior,2), col.names = c("Maquina 1", "Maquina 2", "Ma
 
 Esta estragia sera un poco mejor que la anterior debido a que la cola izquierda del histograma es menos densa. Esto se debe a que al principio de cada año se tiene una mejor aproximacion de las probabilidades de éxito al haber utilizado la informacion de sus distribuciones a priori.
 
-## Estrategia 4: $\epsilon$-greedy (con tasa observada)
+## Estrategia 4: \epsilon-greedy (con tasa observada)
 
-Esta estrategia combina otras dos anteriores,
+Esta estrategia es una combinacion de otras dos anteriores, la greedy con tasa observada y la completamente al azar. Se le elige utlizar la primera mencionada con una probabilidad de $\epsilon$ y la segunda con una probabilidad de $1-\epsilon$. Mientras mas cerca este \epsilon de 1, se parecera mas al completamente al azar y mientras mas cerca este del 0 a greedy con tasa observada. 
+Debido a que uno decide que valor asignarle a \epsilon, se realiza un analisis previa para obtener el mejor \epsilon.
 
 
-Viendo como funciona, nos damos cuenta que mientras mas cerca este e de 1, se parecera mas a una maquina al azar y mientras mas cerca este del 0 a una greedy con tasa. Se simulan casos para varios valores de e y se observa lo siguiente.
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+vector = data.frame(matrix(nrow = 101, ncol = 3))
 
-/grafico/
+for (i in 0:100) {
+  matriz = actualizar(366, 1000, "e_greedy", e = i/100)
+  matriz = filter(matriz, Dia == 366)
+  matriz = matriz[, 6:8]
+  vector[i,] = colMeans(matriz)
+}
 
-Queremos que las veces que se use mejor maquina en promedio sea maxima, por lo que elegimos el e que satisfaga esto.
+
+
+xxx = rbind(as.matrix(vector[1:100,1]), as.matrix(vector[1:100,2]), as.matrix(vector[1:100,3]))
+xxx = as.data.frame(cbind(xxx, rep(c(1, 2, 3), each = 100), seq(0, .99, .01)))
+colnames(xxx) = c("x", "Maquina", "seq")
+
+
+ggplot(xxx)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+
+tema+
+scale_y_continuous(name="Cantidad de veces promedio jugadas",breaks = seq(0,280,40),limits = c(0,280))+
+  scale_x_continuous(name="Epsilon",breaks = seq(0,1,.1)) +
+  scale_color_discrete(type=c("purple", "green","blue"), name = "", labels = c("Maquina 1","Maquina 2", "Maquina 3" ))+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
+  theme(legend.position = c(.85,.85), legend.background = element_blank(), legend.key = element_blank(),axis.title.y.left = element_text(size = 9))
+
+e = xxx$seq[which.max(xxx$x)]
+```
+
+
+
+Queremos que las veces que se use la mejor maquina en promedio sea maxima, por lo que elegimos el e que satisfaga esta condicion. Este valor sera `r e`.
 
 
 
@@ -577,7 +608,8 @@ colnames(Exitos_e_greedy_totales) = "x"
 
 ggplot(Exitos_e_greedy_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 150), breaks = seq(0, 150, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_e_greedy = round(mean(Exitos_e_greedy_totales$x),2)
 
@@ -604,6 +636,40 @@ kable(round(med_e_greedy,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3"
 
 
 ## Estrategia 5: Softmax
+
+En esta estrategia, para elegir la maquina a jugar primero se obtiene la probabilidad de exito observada $\pi_i$ de cada maquina y se les aplica la siguente formula:
+
+$$\mathrm{Pr}(i) = \frac{e^{\pi_i/\tau}}{\sum_{j=1}^3 e^{\pi_i/\tau}} $$
+
+Siendo \tau un parametro de "temperatura" que controla el grado de exploracion. Luego se elige la maquina i con probabilidad $\mathrm{Pr}(i)$.
+
+Se observa en la siguiente tabla las tasas de las probabilidades de exito reales de las maquinas para ver que les ocurre cuando \tau varia.
+
+
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+s1 = round(c(prob[2]/prob[1],prob[2]/prob[3]),2)
+
+s3 = round(c(softmax(prob,c(1),1)[2]/softmax(prob,1,1)[1], softmax(prob,1,1)[2]/softmax(prob,1,1)[3]),2)
+
+s2 = round(c(softmax(prob,.02,1)[2]/softmax(prob,.04,1)[1], softmax(prob,.02,1)[2]/softmax(prob,.04,1)[3]),2)
+
+s4 = round(c(softmax(prob,50,1)[2]/softmax(prob,25,1)[1], softmax(prob,50,1)[2]/softmax(prob,25,1)[3]),2)
+
+s = as.data.frame(rbind(s1, s2, s3, s4))
+rownames(s) = c("Originales", "Temperatura = 1/25", "Temperatura = 1", "Temperatura = 25" )
+
+kable(s, col.names = c("Maquina 2 / Maquina 1", "Maquina 2 / Maquina 3")) %>% 
+  kable_material(c("striped", "hover"))
+
+
+row.names(med) = c("Media", "Mediana")
+
+kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
+
+```
+
+Cuando la temperatura crece, la diferencias entre las probabilidades de exito de cada maquina disminuyen mientras que las diferencias aumentan cuando la temperatura disminuye. Cuando la temperatura es alta, se exploran todas las maquinas, mientras que cuando es baja, se explota la que hasta el momento sea la que tenga la mayor probabilidad de exito.
+
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
@@ -706,7 +772,8 @@ colnames(Exitos_softmax_totales) = "x"
 
 ggplot(Exitos_softmax_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_softmax = round(mean(Exitos_softmax_totales$x),2)
 
@@ -816,7 +883,8 @@ colnames(Exitos_upper_totales) = "x"
 
 ggplot(Exitos_upper_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_upper = round(mean(Exitos_upper_totales$x),2)
 
@@ -948,7 +1016,8 @@ colnames(Exitos_thompson_totales) = "x"
 
 ggplot(Exitos_thompson_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 Media_thompson = round(mean(Exitos_thompson_totales$x),2)
 

@@ -77,33 +77,45 @@ ggplot(xxx2)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+tema+
 #graf softmax
 
 
-softo1 = actualizar(366, 1000, "e_greedy", e = .05 )
+softo1 = actualizar(366, 1000, "softmax", temp = 100 )
 softo1 = filter(softo1, Dia == 366)
 softo1 = as.data.frame(rowSums(softo1[, 3:5]))
 colnames(softo1) = "x"
-softo2 = actualizar(366, 1000, "e_greedy", e = .5 )
+softo2 = actualizar(366, 1000, "softmax", e = 1 )
 softo2 = filter(softo2, Dia == 366)
 softo2 = as.data.frame(rowSums(softo2[, 3:5]))
 colnames(softo2) = "x"
-softo3 = actualizar(366, 1000, "e_greedy", e = .95 )
+softo3 = actualizar(366, 1000, "softmax", e = .01 )
 softo3 = filter(softo3, Dia == 366)
 softo3 = as.data.frame(rowSums(softo3[, 3:5]))
 colnames(softo3) = "x"
 
-graf1 = ggplot(softo1, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
-  scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,200), breaks = seq(0,155,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(96,232,8), limits = c(128,232), name = "Unidades monetarias")+ tema
-
-graf2 = ggplot(softo2, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
-  scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,200), breaks = seq(0,155,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(96,232,8), limits = c(128,232), name = "Unidades monetarias")+ tema
-
-graf3 = ggplot(softo3, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
-  scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,200), breaks = seq(0,155,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(96,232,8), limits = c(128,232), name = "Unidades monetarias")+ tema
 
 
-grid.arrange(graf1, graf2, graf3, ncol = 3)
+
+
+
+
+
+s1 = round(c(prob[2]/prob[1],prob[2]/prob[3]),2)
+
+s3 = round(c(softmax(prob,c(1),1)[2]/softmax(prob,1,1)[1], softmax(prob,1,1)[2]/softmax(prob,1,1)[3]),2)
+
+s2 = round(c(softmax(prob,.02,1)[2]/softmax(prob,.04,1)[1], softmax(prob,.02,1)[2]/softmax(prob,.04,1)[3]),2)
+
+s4 = round(c(softmax(prob,50,1)[2]/softmax(prob,25,1)[1], softmax(prob,50,1)[2]/softmax(prob,25,1)[3]),2)
+
+s = as.data.frame(rbind(s1, s2, s3, s4))
+rownames(s) = c("Originales", "Temperatura = 1/25", "Temperatura = 1", "Temperatura = 25" )
+
+kable(s, col.names = c("Maquina 2 / Maquina 1", "Maquina 2 / Maquina 3")) %>% 
+  kable_material(c("striped", "hover"))
+
+
+row.names(med) = c("Media", "Mediana")
+
+kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
+
 
 
 
