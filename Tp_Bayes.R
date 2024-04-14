@@ -74,6 +74,37 @@ ggplot(xxx2)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.15,.85), legend.background = element_blank(), legend.key = element_blank())
 
+#graf softmax
+
+
+softo1 = actualizar(366, 1000, "e_greedy", e = .05 )
+softo1 = filter(softo1, Dia == 366)
+softo1 = as.data.frame(rowSums(softo1[, 3:5]))
+colnames(softo1) = "x"
+softo2 = actualizar(366, 1000, "e_greedy", e = .5 )
+softo2 = filter(softo2, Dia == 366)
+softo2 = as.data.frame(rowSums(softo2[, 3:5]))
+colnames(softo2) = "x"
+softo3 = actualizar(366, 1000, "e_greedy", e = .95 )
+softo3 = filter(softo3, Dia == 366)
+softo3 = as.data.frame(rowSums(softo3[, 3:5]))
+colnames(softo3) = "x"
+
+graf1 = ggplot(softo1, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,200), breaks = seq(0,155,25), name = "Frecuencia absoluta") +
+  scale_x_continuous(breaks = seq(96,232,8), limits = c(128,232), name = "Unidades monetarias")+ tema
+
+graf2 = ggplot(softo2, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,200), breaks = seq(0,155,25), name = "Frecuencia absoluta") +
+  scale_x_continuous(breaks = seq(96,232,8), limits = c(128,232), name = "Unidades monetarias")+ tema
+
+graf3 = ggplot(softo3, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,200), breaks = seq(0,155,25), name = "Frecuencia absoluta") +
+  scale_x_continuous(breaks = seq(96,232,8), limits = c(128,232), name = "Unidades monetarias")+ tema
+
+
+grid.arrange(graf1, graf2, graf3, ncol = 3)
+
 
 
 
@@ -102,8 +133,6 @@ row.names(med) = c("Media", "Mediana")
 kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
 
 
-
-#Analisis de las maquinas jugadas para 
 
 
 
