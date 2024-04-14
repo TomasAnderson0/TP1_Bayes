@@ -18,6 +18,11 @@ random = function(y, temp, e){
 
 softmax = function(tasas, temp, e){
   p = exp(tasas / temp) / sum(exp(tasas / temp))
+  for (k in 1:length(p)) {
+    if (is.na(p[k])) {
+      p[k] = 0
+    }
+  }
   return(p)}
 
 soft = function(y, temp, e){
@@ -28,6 +33,9 @@ soft = function(y, temp, e){
     }
   }
   p = softmax(tasa, temp)
+  if (sum(p) == 0) {
+    p = rep(1/3,3)
+  }
   cual = sample(c(1, 2, 3), size = 1, prob = p)
   vector = c(rbinom(1, 1, prob[cual]), cual)
   return(vector)
@@ -90,7 +98,7 @@ greedy_tasa = function(y, temp, e){
 
 e_greedy = function(y, temp, e){
   which = rbinom(1, 1, e)
-  if (which == 1) {
+  if (which == 0) {
     return(greedy_tasa(y, temp ,e))
   } else {
     return(random(y, temp, e))

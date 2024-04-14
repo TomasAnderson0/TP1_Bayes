@@ -1,6 +1,7 @@
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
+library(knitr)
 source("Funciones.R")
 
 
@@ -10,8 +11,6 @@ set.seed(69)
 
 vector = data.frame(matrix(nrow = 101,ncol = 3))
 
-matriz = actualizar(366, 1000, "e_greedy", e = 1)
-
 for (i in 0:100) {
   matriz = actualizar(366, 1000, "e_greedy", e = i/100)
   matriz = filter(matriz, Dia == 366)
@@ -20,7 +19,6 @@ for (i in 0:100) {
 }
 
 
-vector
 
 xxx=rbind(as.matrix(vector[1:100,1]),as.matrix(vector[1:100,2]),as.matrix(vector[1:100,3]))
 xxx=as.data.frame(cbind(xxx,rep(c(1,2,3), each = 100),seq(0,.99,.01)))
@@ -32,7 +30,89 @@ ggplot(xxx)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+tema+
   scale_x_continuous(name="Epsilon",breaks = seq(0,1,.1)) +
   scale_color_discrete(type=c("purple", "green","blue"),name = "", labels = c("Maquina 1","Maquina 2", "Maquina 3" ))+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
+  theme(legend.position = c(.85,.85), legend.background = element_blank(), legend.key = element_blank())
+
+xxx$seq[which.max(xxx$x)]
+
+
+vector2 = data.frame(matrix(nrow = 101,ncol = 3))
+
+temperatura = c(seq(.02,1,.02),seq(2,50,1))
+
+
+k=NA
+
+is.na(k)
+
+
+set.seed(69)
+
+for (i in 1:99) {
+  matriz2 = actualizar(366, 1000, "softmax", temp = temperatura[i] )
+  matriz2 = filter(matriz2, Dia == 366)
+  matriz2 = matriz2[, 6:8]
+  vector2[i,] = colMeans(matriz2)
+}
+
+vector2
+
+exp(seq(0,1,.1)/.5)
+
+
+
+
+xxx2=rbind(as.matrix(vector2[1:99,1]),as.matrix(vector2[1:99,2]),as.matrix(vector2[1:99,3]))
+xxx2=as.data.frame(cbind(xxx,rep(c(1,2,3), each = 99), c(seq(.02,1,.02),seq(2,50,1))))
+colnames(xxx2) = c("x","Maquina","seq")
+xxx2
+
+
+ggplot(xxx2)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+tema+
+  scale_y_continuous(name="Cantidad de veces promedio jugadas",breaks = seq(0,280,40),limits = c(0,280))+
+  scale_x_continuous(name="Temperatura", limits = c(1,50)) +
+  scale_color_discrete(type=c("purple", "green","blue"),name = "", labels = c("Maquina 1","Maquina 2", "Maquina 3" ))+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.15,.85), legend.background = element_blank(), legend.key = element_blank())
+
+
+
+
+
+#Analisis de las maquinas jugadas para greedy tasa
+set.seed(69)
+
+datos_greedy_tasa_año = actualizar(366, 1000, "greedy_tasa")
+datos_greedy_tasa_filter = filter(datos_greedy_tasa_año, Dia == 366)
+
+rbind(colMeans(datos_greedy_tasa_filter[,6:8]), c(median(datos_greedy_tasa_filter[,6]),
+                                                  median(datos_greedy_tasa_filter[,7]),
+                                                  median(datos_greedy_tasa_filter[,8])))
+#Analisis de las maquinas jugadas para greedy_posterior
+
+set.seed(69)
+
+datos_greedy_posterior_año = actualizar(366, 1000, "greedy_posterior")
+datos_greedy_posterior_filter = filter(datos_greedy_posterior_año, Dia == 366)
+
+med = rbind(colMeans(datos_greedy_posterior_filter[,6:8]), c(median(datos_greedy_posterior_filter[,6]),
+                                                  median(datos_greedy_posterior_filter[,7]),
+                                                 median(datos_greedy_posterior_filter[,8])))
+row.names(med) = c("Media", "Mediana")
+
+kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
+
+
+
+#Analisis de las maquinas jugadas para 
+
+
+
+
+
+
+
+
+
 
 
 

@@ -27,6 +27,8 @@ library(tidyverse)
 library(ggplot2)
 library(gridExtra)
 library(ggpubr)
+library(knitr)
+library(kableExtra)
 source("Funciones.R")
 prob=c(.3, .55, .45)
 tema = theme(panel.grid = element_line(color = "lightgrey"),
@@ -407,6 +409,16 @@ Media_greedy_posterior = round(mean(Exitos_greedy_posterior_totales$x),2)
 Q_greedy_posterior = sort(Exitos_greedy_posterior_totales$x)
 
 Q_greedy_posterior_int = c(mean(Q_greedy_posterior[25], Q_greedy_posterior[26]), mean(Q_greedy_posterior[975], Q_greedy_posterior[976]))
+
+
+
+med = rbind(colMeans(datos_greedy_posterior_filter[,6:8]), c(median(datos_greedy_posterior_filter[,6]),  median(datos_greedy_posterior_filter[,7]), median(datos_greedy_posterior_filter[,8])))
+row.names(med) = c("Media", "Mediana")
+
+kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
+
+
+
 ```
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_posterior` unidades monetarias en un año.
@@ -419,7 +431,14 @@ Esta estragia sera un poco mejor que la anterior debido a que la cola izquierda 
 
 Esta estrategia combina otras dos anteriores,
 
-Se selecciona la mejor máquina (la de mayor tasa de éxito observada según los datos actuales) con una probabilidad de 2/3 y se elige una máquina al azar con una probabilidad 1/3 .
+
+Viendo como funciona, nos damos cuenta que mientras mas cerca este e de 1, se parecera mas a una maquina al azar y mientras mas cerca este del 0 a una greedy con tasa. Se simulan casos para varios valores de e y se observa lo siguiente.
+
+/grafico/
+
+Queremos que las veces que se use mejor maquina en promedio sea maxima, por lo que elegimos el e que satisfaga esto.
+
+
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
@@ -538,7 +557,7 @@ Se juega un año con esta estrategia y se obtienen los siguites resultados:
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-temperatura = 4/5
+temperatura = .02
 
 datos_softmax_dia = actualizar(366, 1,"softmax", temp = temperatura)
 
@@ -622,7 +641,7 @@ Pb_softmax_3 =(2+datos_softmax_dia$Maquina3[366]) / (4+datos_softmax_dia$Maquina
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-temperatura = 4/5
+temperatura = .5
 
 datos_softmax_año = actualizar(366, 1000, "softmax", temp = temperatura)
 
