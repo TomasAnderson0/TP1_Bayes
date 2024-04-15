@@ -11,6 +11,10 @@ set.seed(69)
 
 vector = data.frame(matrix(nrow = 101,ncol = 3))
 
+matriz = actualizar(366, 1000, "e_greedy", e = 50/100)
+matriz = filter(matriz, Dia == 366)
+
+
 for (i in 0:100) {
   matriz = actualizar(366, 1000, "e_greedy", e = i/100)
   matriz = filter(matriz, Dia == 366)

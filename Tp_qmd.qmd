@@ -16,10 +16,12 @@ Fecha de entrega: 17/04/2024
 
 ## Introduccion
 
-To do
+El humano tiene que enfrentarse a una gran cantidad de decisiones en su vida diaria. Algunas pueden ser irrelevantes, como la elección de para qué lado dormirse o cuál es el primer pie al que se le pone la media al vestirse*.* En cambio, otros dilemas pueden ser de una importancia superior en la que se espera un *mayor uso* de racionalidad. Por ejemplo, al terminar la escuela, *¿Empezar a trabajar o estudiar?, ¿Qué carrera seguir?, ¿Salir de fiesta con tanta lluvia el fin de semana?.* *Estos* problemas de decisión *que conllevan* un poco más de esfuerzo pueden ser analizados de forma dicotómica, basar la elección en base a la seguridad de lo familiar y el conocimiento previo o decantarse por lo desconocido y arriesgado pero con posibles recompensas mayores. Usando los ejemplos anteriores, *¿seguir una carrera que se adecúe a las técnicas propias o elegir una carrera de conocimientos inexplorados?,¿Quedarse en casa viendo una serie o salir de fiesta pudiendo ser una noche inolvidable o una desastrosa?*. Este dilema se lo conoce como *"explorar vs. explotar"* en el cual el primero hace referencia a la promesa de lo desconocido y lo segundo a la seguridad de lo familiar.
+
+En este informe se analizará una situación hipotética que plantea la disyuntiva de *"explorar vs. explotar"*. El problema del *Multi-armed Bandit*
+se trata de imaginarse una situación en donde se tienen tres máquinas tragamonedas, es decir, máquinas en las que se hace girar unos rodillos con figuras en cada cara y en el caso de coincidir la figura se gana dinero, en caso contrario, no se gana nada, en este informe a esa acción se la llamará "tirada".
 
 # Desarrollo
-
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 library(tidyverse)
@@ -191,8 +193,6 @@ kable(round(med_random,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3"))
 
 ```
 
-
-
 El promedio de ganancias al final del año es sustancialmente mas chico que el de la situacion ideal y los intervalos siquiera se superponen. Se puede pensar que esta estrategia no es recomendable al diferir tanto de un resultado ideal.
 
 ## Estrategia 2: Greedy con tasa observada
@@ -311,7 +311,6 @@ En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_tasa` un
 
 El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_tasa_int[1]` y `r Q_greedy_tasa_int[2]`.
 
-
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 
 med_greedy_tasa = rbind(colMeans(datos_greedy_tasa_filter[,6:8]), c(median(datos_greedy_tasa_filter[,6]), median(datos_greedy_tasa_filter[,7]), median(datos_greedy_tasa_filter[,8])))
@@ -320,9 +319,6 @@ row.names(med_greedy_tasa) = c("Media", "Mediana")
 kable(round(med_greedy_tasa,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
 
 ```
-
-
-
 
 Si bien es un metodo que en promedio gana una cantidad similar de dinero comparado a la situacion ideal, existe el riesgo de ganar mucho menos que el promedio, ya que en general la estrategia suele usar una misma maquina en casi todo el año y hay una probabilidad no despreciable de elegir la peor de ellas.
 
@@ -461,58 +457,47 @@ kable(round(med_greedy_posterior,2), col.names = c("Maquina 1", "Maquina 2", "Ma
 
 ```
 
-
-
-
-
 Esta estragia sera un poco mejor que la anterior debido a que la cola izquierda del histograma es menos densa. Esto se debe a que al principio de cada año se tiene una mejor aproximacion de las probabilidades de éxito al haber utilizado la informacion de sus distribuciones a priori.
 
-## Estrategia 4: \epsilon-greedy (con tasa observada)
+## Estrategia 4: $\epsilon$-greedy (con tasa observada)
 
-Esta estrategia es una combinacion de otras dos anteriores, la greedy con tasa observada y la completamente al azar. Se le elige utlizar la primera mencionada con una probabilidad de $\epsilon$ y la segunda con una probabilidad de $1-\epsilon$. Mientras mas cerca este \epsilon de 1, se parecera mas al completamente al azar y mientras mas cerca este del 0 a greedy con tasa observada. 
-Debido a que uno decide que valor asignarle a \epsilon, se realiza un analisis previa para obtener el mejor \epsilon.
-
+Esta estrategia es una combinacion de otras dos anteriores, la greedy con tasa observada y la completamente al azar. Se elige utlizar la primera mencionada con una probabilidad de $1 - \epsilon$ y la segunda con una probabilidad de $\epsilon$. Mientras mas cerca este $\epsilon$ de 1, se parecera mas a la completamente al azar y mas cerca este del 0 a la greedy con tasa observada. Debido a que uno decide que valor asignarle a $\epsilon$, se realiza un analisis previo para obtener su mejor valor.
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
-vector = data.frame(matrix(nrow = 101, ncol = 3))
+vector = data.frame(matrix(nrow = 101, ncol = 1))
 
 for (i in 0:100) {
   matriz = actualizar(366, 1000, "e_greedy", e = i/100)
   matriz = filter(matriz, Dia == 366)
-  matriz = matriz[, 6:8]
-  vector[i,] = colMeans(matriz)
+  vector[i,] = sum(matriz[, 3:5])
+
 }
 
 
 
-xxx = rbind(as.matrix(vector[1:100,1]), as.matrix(vector[1:100,2]), as.matrix(vector[1:100,3]))
-xxx = as.data.frame(cbind(xxx, rep(c(1, 2, 3), each = 100), seq(0, .99, .01)))
-colnames(xxx) = c("x", "Maquina", "seq")
+xxx = as.matrix(vector/1000)
+xxx = as.data.frame(cbind(xxx, seq(0, .99, .01)))
+colnames(xxx) = c("x", "seq")
 
 
-ggplot(xxx)+geom_line(aes(x=seq,y=x,color=as.factor(Maquina)))+
+ggplot(xxx)+geom_line(aes(x = seq, y = x), color = "red")+
 tema+
-scale_y_continuous(name="Cantidad de veces promedio jugadas",breaks = seq(0,280,40),limits = c(0,280))+
-  scale_x_continuous(name="Epsilon",breaks = seq(0,1,.1)) +
-  scale_color_discrete(type=c("purple", "green","blue"), name = "", labels = c("Maquina 1","Maquina 2", "Maquina 3" ))+
+scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0,280))+
+  scale_x_continuous(name="Epsilon",breaks = seq(0,1,.1))+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
-  theme(legend.position = c(.85,.85), legend.background = element_blank(), legend.key = element_blank(),axis.title.y.left = element_text(size = 9))
+  theme(legend.position = c(.85,.85), legend.background = element_blank(), legend.key = element_blank())
 
 e = xxx$seq[which.max(xxx$x)]
 ```
 
-
-
-Queremos que las veces que se use la mejor maquina en promedio sea maxima, por lo que elegimos el e que satisfaga esta condicion. Este valor sera `r e`.
-
-
+Queremos que en promedio se gane lo mayor posible. El valor que maximiza las ganancias es `r e`.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-epsilon = .05
+epsilon = e
 
 datos_e_greedy_dia = actualizar(366, 1,"e_greedy", e = epsilon)
 
@@ -538,7 +523,8 @@ plot2_e_greedy_dia = ggplot(datos_e_greedy_dia)+
 grid.arrange(plot1_e_greedy_dia, plot2_e_greedy_dia, ncol = 2)
 ```
 
-Posteriors:
+En el primer mes de juego, se decide cual es la maquina con mayor probabilidad de exito y luego se utiliza mayoritariamente una sola maquina hasta el final del año. La maquina 1 y 3 se utilizan en el resto del año solo cuando se usa la estrategia completamente al azar.
+
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
@@ -591,12 +577,16 @@ Pb_e_greedy_3 =(2+datos_e_greedy_dia$Maquina3[366]) / (4+datos_e_greedy_dia$Maqu
 
 ```
 
-1000 años:
+
+La precision de la creencia de la maquina 2 es alta, ya que es la que se utiliza con mas frecuencia. La de las demas luego de los primeros meses no cambia mucho.
+
+
+Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-epsilon = .05
+epsilon = e
 
 datos_e_greedy_año = actualizar(366, 1000, "e_greedy", e = epsilon)
 
@@ -619,6 +609,16 @@ Q_e_greedy_int = c(mean(Q_e_greedy[25], Q_e_greedy[26]), mean(Q_e_greedy[975], Q
 ```
 
 
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_e_greedy` unidades monetarias en un año.
+
+El 95% de las ganancias al final del año estuvieron entre `r Q_e_greedy_int[1]` y `r Q_e_greedy_int[2]`.
+
+
+El problema de la greedy con tasa observada es, a veces, no utilizar mayoritariamente la maquina con mayor probabilidad de exito. El usar la estrategia completamente al azar esporadicamente, permite explorar las probabilidades de exito de las maquinas para que al utilizar la greedy con tasa observada, esta seleccione la mejor de ellas con mayor regularidad.
+
+
+
+
 
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
@@ -630,11 +630,6 @@ kable(round(med_e_greedy,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3"
 
 ```
 
-
-
-
-
-
 ## Estrategia 5: Softmax
 
 En esta estrategia, para elegir la maquina a jugar primero se obtiene la probabilidad de exito observada $\pi_i$ de cada maquina y se les aplica la siguente formula:
@@ -644,7 +639,6 @@ $$\mathrm{Pr}(i) = \frac{e^{\pi_i/\tau}}{\sum_{j=1}^3 e^{\pi_i/\tau}} $$
 Siendo \tau un parametro de "temperatura" que controla el grado de exploracion. Luego se elige la maquina i con probabilidad $\mathrm{Pr}(i)$.
 
 Se observa en la siguiente tabla las tasas de las probabilidades de exito reales de las maquinas para ver que les ocurre cuando \tau varia.
-
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 s1 = round(c(prob[2]/prob[1],prob[2]/prob[3]),2)
@@ -669,6 +663,38 @@ kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_mater
 ```
 
 Cuando la temperatura crece, la diferencias entre las probabilidades de exito de cada maquina disminuyen mientras que las diferencias aumentan cuando la temperatura disminuye. Cuando la temperatura es alta, se exploran todas las maquinas, mientras que cuando es baja, se explota la que hasta el momento sea la que tenga la mayor probabilidad de exito.
+
+
+```{r}
+vector2 = data.frame(matrix(nrow = 50, ncol = 1))
+
+temperatura = c(seq(1/25,2,1/25))
+
+for (i in 1:50) {
+  matriz2 = actualizar(366, 1000, "softmax", temp = temperatura[i] )
+  matriz2 = filter(matriz2, Dia == 366)
+  vector2[i,] = sum(matriz2[, 3:5])
+}
+
+
+
+
+xxx2 = as.matrix(vector2/1000)
+xxx2 = as.data.frame(cbind(xxx2, temperatura))
+colnames(xxx2) = c("x", "seq")
+
+
+ggplot(xxx2)+geom_line(aes(x = seq, y = x), color = "red")+
+tema+
+scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0,280))+
+  scale_x_continuous(name="Temperatura")+
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+
+e = xxx$seq[which.max(xxx2$x)]
+```
+
+
+
 
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
@@ -906,7 +932,6 @@ kable(round(med_upper,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) 
 
 ```
 
-
 Se puede observar que el histograma de esta estrategia es mucho mas simetrico que el de las tecnicas anteriores que se le parecen. Esto se debe a que cada año la maquina con la que mas veces se suele quedar el metodo es la 2, es decir, la que mayor probabilidad de exito tiene.
 
 ## Estrategia 7: Thompson sampling
@@ -944,7 +969,6 @@ grid.arrange(plot1_thompson_dia, plot2_thompson_dia, ncol = 2)
 ```
 
 En este caso, en los primero 3 o 4 meses, la estrategia usa todas las maquinas. Luego de este periodo, utiliza mayormente la segunda dejando de utilizar las demas aproximadamente a mitad de año. Se parece a las demas estrategias con la diferencia de usar muchas mas veces las maquinas con las que no se termina quedando el metodo.
-
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
@@ -997,11 +1021,9 @@ Pb_thompson_3 =(2+datos_thompson_dia$Maquina3[366]) / (4+datos_thompson_dia$Maqu
 
 ```
 
-
-Generalmente esta estragia, como la mayoria de las demas, luego de un cierto numero de dias procede a jugar con una sola maquina. 
+Generalmente esta estragia, como la mayoria de las demas, luego de un cierto numero de dias procede a jugar con una sola maquina.
 
 Para observar como varian las ganancias usando este metodo se simularon 1000 años, las cuales arrojaron los siguientes resultados:
-
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
@@ -1025,6 +1047,7 @@ Q_thompson = sort(Exitos_thompson_totales$x)
 
 Q_thompson_int = c(mean(Q_thompson[25], Q_thompson[26]), mean(Q_thompson[975], Q_thompson[976]))
 ```
+
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_upper` unidades monetarias en un año.
 
 El 95% de las ganancias al final del año estuvieron entre `r Q_upper_int[1]` y `r Q_upper_int[2]`.
@@ -1038,16 +1061,6 @@ kable(round(med_thompson,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3"
 
 ```
 
-
-
-
-
-Esta estrategia, como la anterior, tiene un histograma bastante simetrico.
-Es mejor que los otros metodos parecidos pero es peor que upper bound ya que tiene un promedio de ganancias mas chico y ambos extremos de los intervalos son menores. 
-
-
-
-
-
+Esta estrategia, como la anterior, tiene un histograma bastante simetrico. Es mejor que los otros metodos parecidos pero es peor que upper bound ya que tiene un promedio de ganancias mas chico y ambos extremos de los intervalos son menores.
 
 Hacer: e, temperatura, caratula, comparacion cuantas veces se elige cada maquina
