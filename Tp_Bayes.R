@@ -385,107 +385,11 @@ ggplot(datos_greedy_tasa_dia)+
   scale_x_continuous(name="Dias",breaks = seq(0,366,61))
 
 
-#Maquina 1
-datos=matrix(seq(0,1,.001),nrow = 1001)
-datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
-for (i in 1:6) {
-  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_greedy_tasa_dia$Maquina1[61*i],2-datos_greedy_tasa_dia$Maquina1[61*i]+datos_greedy_tasa_dia$Maquina1Total[61*i]))
-}
 
-datos = as.data.frame(datos)
-colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
-                    "Dia366")
+med_random = rbind(colMeans(datos_random_filter[,6:8]), c(median(datos_random_filter[,6]), median(datos_random_filter[,7]), median(datos_random_filter[,8])))
+row.names(med_random) = c("Media", "Mediana")
 
-ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
-  geom_line(aes(x=seq,y=Dia61,color="Dia 61"))+
-  geom_line(aes(x=seq,y=Dia122,color="Dia 122"))+
-  geom_line(aes(x=seq,y=Dia183,color="Dia 183"))+
-  geom_line(aes(x=seq,y=Dia244,color="Dia 244"))+
-  geom_line(aes(x=seq,y=Dia305,color="Dia 305"))+
-  geom_line(aes(x=seq,y=Dia366, color ="Dia 366"))+
-  tema+
-  scale_y_continuous(name="Credibilidad")+
-  theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
-  scale_x_continuous(name="Probabilidad de éxito") +
-  scale_color_discrete(breaks=c("Dia 0", "Dia 61", "Dia 122", "Dia 183", "Dia 244","Dia 305","Dia 366"),type=colores,name="Días")
-
-
-
-#Maquina 2
-datos=matrix(seq(0,1,.001),nrow = 1001)
-datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
-for (i in 1:6) {
-  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_greedy_tasa_dia$Maquina2[61*i],2-datos_greedy_tasa_dia$Maquina2[61*i]+datos_greedy_tasa_dia$Maquina2Total[61*i]))
-}
-
-
-datos = as.data.frame(datos)
-colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
-                    "Dia366")
-
-ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
-  geom_line(aes(x=seq,y=Dia61,color="Dia 61"))+
-  geom_line(aes(x=seq,y=Dia122,color="Dia 122"))+
-  geom_line(aes(x=seq,y=Dia183,color="Dia 183"))+
-  geom_line(aes(x=seq,y=Dia244,color="Dia 244"))+
-  geom_line(aes(x=seq,y=Dia305,color="Dia 305"))+
-  geom_line(aes(x=seq,y=Dia366, color ="Dia 366"))+
-  tema+
-  scale_y_continuous(name="Credibilidad")+
-  theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
-  scale_x_continuous(name="Probabilidad de éxito") +
-  scale_color_discrete(breaks=c("Dia 0", "Dia 61", "Dia 122", "Dia 183", "Dia 244","Dia 305","Dia 366"),type=colores,name="Días")
-
-
-#Maquina 3
-datos=matrix(seq(0,1,.001),nrow = 1001)
-datos=cbind(datos,dbeta(seq(0,1,.001),2,2))
-for (i in 1:6) {
-  datos=cbind(datos,dbeta(seq(0,1,.001),2+datos_greedy_tasa_dia$Maquina3[61*i],2-datos_greedy_tasa_dia$Maquina3[61*i]+datos_greedy_tasa_dia$Maquina3Total[61*i]))
-}
-
-
-datos = as.data.frame(datos)
-colnames(datos) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305",
-                    "Dia366")
-
-ggplot(datos)+geom_line(aes(x=seq,y=Dia0,color="Dia 0"))+
-  geom_line(aes(x=seq,y=Dia61,color="Dia 61"))+
-  geom_line(aes(x=seq,y=Dia122,color="Dia 122"))+
-  geom_line(aes(x=seq,y=Dia183,color="Dia 183"))+
-  geom_line(aes(x=seq,y=Dia244,color="Dia 244"))+
-  geom_line(aes(x=seq,y=Dia305,color="Dia 305"))+
-  geom_line(aes(x=seq,y=Dia366, color ="Dia 366"))+
-  tema+
-  scale_y_continuous(name="Credibilidad")+
-  theme(axis.ticks.y = element_blank(),axis.text.y = element_blank())+
-  scale_x_continuous(name="Probabilidad de éxito") +
-  scale_color_discrete(breaks=c("Dia 0", "Dia 61", "Dia 122", "Dia 183", "Dia 244","Dia 305","Dia 366"),type=colores,name="Días")
-
-
-
-
-datos_greedy_tasa_año=actualizar(366,1000,"greedy_tasa")
-
-datos_greedy_tasa_filter=filter(datos_greedy_tasa_año, Dia == 366)
-
-Exitos_greedy_tasa_totales=as.data.frame(rowSums(datos_greedy_tasa_filter[,3:5]))
-
-colMeans(datos_greedy_tasa_filter[,6:8])
-
-colnames(Exitos_greedy_tasa_totales)="x"
-
-
-ggplot(Exitos_greedy_tasa_totales,aes(x))+geom_histogram(fill = "#FF8F54", color = "black",binwidth = 4) +
-  scale_y_continuous(expand = expand_scale(add = c(0, 0)),name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(128,192,8),name = "Unidades monetarias")+ tema
-
-Media_greedy_tasa_totales=mean(Exitos_greedy_tasa_totales)
-
-Ordenados_greedy_tasa_totales = sort(Exitos_greedy_tasa_totales)
-
-Q_greedy_tasa_totales=c(mean(Ordenados_random_totales[25], Ordenados_random_totales[26]), 
-                   mean(Ordenados_random_totales[975], Ordenados_random_totales[976]))
+kable(round(med_random,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
 
 
 

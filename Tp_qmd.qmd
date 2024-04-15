@@ -1,27 +1,36 @@
 ---
-title: "Trabajo practico 1"
+title: "Análisis de distintas estrategias en el problema Multi-armed Bandit con estadística bayesiana"
+subtitle: "Trabajo Práctico 1"
 format: pdf
 editor: visual
+toc: true
+lang: "es"
+author:
+  - name: Tomas Anderson
+  - name: Alejo Vaschetti
+  - name: Manuel Moresi
 ---
 
-## The Multiarmed Bandit
 
-Integrantes: Tomas Anderson, Alejo Vaschetti, Manuel Moresi
-
-Profesores: Tomas Capretto, Ignacio Evangelista
-
-Fecha de entrega: 17/04/2024
 
 \newpage
 
-## Introduccion
+# Introduccion
 
-El humano tiene que enfrentarse a una gran cantidad de decisiones en su vida diaria. Algunas pueden ser irrelevantes, como la elección de para qué lado dormirse o cuál es el primer pie al que se le pone la media al vestirse*.* En cambio, otros dilemas pueden ser de una importancia superior en la que se espera un *mayor uso* de racionalidad. Por ejemplo, al terminar la escuela, *¿Empezar a trabajar o estudiar?, ¿Qué carrera seguir?, ¿Salir de fiesta con tanta lluvia el fin de semana?.* *Estos* problemas de decisión *que conllevan* un poco más de esfuerzo pueden ser analizados de forma dicotómica, basar la elección en base a la seguridad de lo familiar y el conocimiento previo o decantarse por lo desconocido y arriesgado pero con posibles recompensas mayores. Usando los ejemplos anteriores, *¿seguir una carrera que se adecúe a las técnicas propias o elegir una carrera de conocimientos inexplorados?,¿Quedarse en casa viendo una serie o salir de fiesta pudiendo ser una noche inolvidable o una desastrosa?*. Este dilema se lo conoce como *"explorar vs. explotar"* en el cual el primero hace referencia a la promesa de lo desconocido y lo segundo a la seguridad de lo familiar.
+El humano tiene que enfrentarse a una gran cantidad de decisiones en su vida diaria. Algunas pueden ser irrelevantes, como la elección de para qué lado dormirse o cuál es el primer pie al que se le pone la media al vestirse. En cambio, otros dilemas pueden ser de una importancia superior en la que se espera un mayor uso de racionalidad. Por ejemplo, al terminar la escuela, ¿Empezar a trabajar o estudiar?, ¿Qué carrera seguir?, ¿Salir de fiesta con tanta lluvia el fin de semana?. Estos problemas de decisión que conllevan un poco más de esfuerzo pueden ser analizados de forma dicotómica, basar la elección en base a la seguridad de lo familiar y el conocimiento previo o decantarse por lo desconocido y arriesgado pero con posibles recompensas mayores. Usando los ejemplos anteriores, ¿Seguir una carrera que se adecúe a las técnicas propias o elegir una carrera de conocimientos inexplorados?,¿Quedarse en casa viendo una serie o salir de fiesta pudiendo ser una noche inolvidable o una desastrosa?. Este dilema se lo conoce como "explorar vs. explotar" en el cual el primero hace referencia a la promesa de lo desconocido y lo segundo a la seguridad de lo familiar.
 
-En este informe se analizará una situación hipotética que plantea la disyuntiva de *"explorar vs. explotar"*. El problema del *Multi-armed Bandit*
-se trata de imaginarse una situación en donde se tienen tres máquinas tragamonedas, es decir, máquinas en las que se hace girar unos rodillos con figuras en cada cara y en el caso de coincidir la figura se gana dinero, en caso contrario, no se gana nada, en este informe a esa acción se la llamará "tirada".
+En este informe se analizará una situación hipotética que plantea la disyuntiva de "explorar vs. explotar". El problema del *Multi-armed Bandit* se trata de imaginarse una situación en donde se tienen varias máquinas tragamonedas, es decir, máquinas en las que se hace girar unos rodillos con figuras en cada cara y en el caso de coincidir la figura se gana dinero, en caso contrario, no se gana nada. Para simplificar, se analizará el problema con el caso de 3 máquinas con distintas probabilidad de ganar, $0.3$, $0.45$ y $0.55$ respectivamente, y donde jugar en la máquina no cuesta dinero. Cada día se puede jugar en una única máquina una sola vez y el objetivo será ganar la mayor cantidad de unidades monetarias en un año bisiesto (366 días) idealmente descubriendo la máquina con mayor probabilidad de éxito. Este informe busca comparar distintas estrategias que tratarán de encontrar un equilibrio en el dilema "explorar vs. explotar".
+
 
 # Desarrollo
+
+Para la resolución de las incógnitas planteadas en la introducción se usarán herramientas correspondientes al análisis bayesiano donde la creencia a priori para las probabilidades de éxito de cada máquina a principio de año toma una distribución Beta$(2,2)$. Al considerar la variable como ganar o no al jugar una máquina, esta toma una distribución Binomial$(1,p)$ por lo que la ditribución a posteriori tiene forma de Beta$(2+1,2)$ si la observación fue un éxito y Beta$(2,2+1)$ en el caso de perder. Por la secuencialidad de las técnicas bayesianas, esta distribución a posteriori pasa a ser la probabilidad a priori en el siguiente día, de esta manera se puede ir actualizando día a día la creencia sobre las probabilidades de éxito de cada máquina.
+
+Se comparan siete estrategias utilizándo simulaciones de, al principio un año para cada una y luego de 1000 años para ver las posibles variaciones que pueda llegar a tener cada método debido a la naturaleza aleatoria de las máquinas tragamonedas. Se programa una función capaz de elegir una máquina siguiendo la estrategia seleccionada, devolver un resultado y actualizar las creencias sobre las probabilidades de éxito y es la que se usará para realizar las simulaciones.
+
+Para tener un punto de referencia con las que se pueda comparar cada método se procede a continuación el planteo de un caso irreal e idóneo en el que se consigue la mayor cantidad de éxitos en un año.
+
+
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 library(tidyverse)
@@ -64,9 +73,9 @@ Q_ideal_int = c(mean(Q_ideal[25], Q_ideal[26]), mean(Q_ideal[975], Q_ideal[976])
 
 En este modus operandi una persona que juege un año se espera que va a ganar alrededor de `r Media_ideal` unidades monetarias.
 
-En el 95% de los años simulados las ganancias totales se encontraron entre `r Q_ideal_int[1]` y `r Q_ideal_int[2]` unidades monetarias. Dicho intervalo, y los que seran presentados en las próximas estrategias, se encuentran entre el 2,5% y el 97,5% de las ganancias totales del método ordenadas de menor a mayor.
+En el 95% de los años simulados las ganancias totales se encontraron entre `r Q_ideal_int[1]` y `r Q_ideal_int[2]` unidades monetarias. Dicho intervalo, y los que seran presentados en las próximas estrategias, se encuentran entre el 2,5% y el 97,5% de las ganancias totales del método ordenadas de menor a mayor. La amplitud del intervalo es de `r Q_ideal_int[2]-Q_ideal_int[1]` unidades monetarias.
 
-Para ver que tan beneficioso es cada estrategia, se comparan la cantidad de veces que se gana en promedio esperando que se acerque lo máximo posible a esta forma de jugar. Además, se contrastan los límites de los intervalos propuestos.
+Para ver que tan beneficioso es cada estrategia, se comparan la cantidad de veces que se gana en promedio esperando que se acerque lo máximo posible a esta forma de jugar. Además, se contrastan las amplitudes de los intervalos propuestos.
 
 ## Estrategia 1: Completamente al azar
 
@@ -180,18 +189,9 @@ Q_random = sort(Exitos_random_totales$x)
 Q_random_int = c(mean(Q_random[25], Q_random[26]), mean(Q_random[975], Q_random[976]))
 ```
 
-En promedio, siguiendo esta estrategia, se espera ganar `r Media_random` unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_random` unidades monetarias en un año. Esto es un `r 100-round(100*Media_random/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_random_int[1]` y `r Q_random_int[2]`.
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
-
-med_random = rbind(colMeans(datos_random_filter[,6:8]), c(median(datos_random_filter[,6]), median(datos_random_filter[,7]), median(datos_random_filter[,8])))
-row.names(med_random) = c("Media", "Mediana")
-
-kable(round(med_random,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
-```
+El 95% de las ganancias al final del año estuvieron entre `r Q_random_int[1]` y `r Q_random_int[2]`. Su amplitud es de `r Q_random_int[2]-Q_random_int[1]` unidades monetarias, siendo `r (Q_random_int[2]-Q_ideal_int[1])-(Q_random_int[2]-Q_ideal_int[1])` mas grande que el del caso ideal, siendo muy parecidos entre si.
 
 El promedio de ganancias al final del año es sustancialmente mas chico que el de la situacion ideal y los intervalos siquiera se superponen. Se puede pensar que esta estrategia no es recomendable al diferir tanto de un resultado ideal.
 
@@ -307,20 +307,12 @@ Q_greedy_tasa = sort(Exitos_greedy_tasa_totales$x)
 Q_greedy_tasa_int = c(mean(Q_greedy_tasa[25], Q_greedy_tasa[26]), mean(Q_greedy_tasa[975], Q_greedy_tasa[976]))
 ```
 
-En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_tasa` unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_tasa` unidades monetarias en un año. Esto es un `r 100-round(100*Media_greedy_tasa/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_tasa_int[1]` y `r Q_greedy_tasa_int[2]`.
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
-
-med_greedy_tasa = rbind(colMeans(datos_greedy_tasa_filter[,6:8]), c(median(datos_greedy_tasa_filter[,6]), median(datos_greedy_tasa_filter[,7]), median(datos_greedy_tasa_filter[,8])))
-row.names(med_greedy_tasa) = c("Media", "Mediana")
-
-kable(round(med_greedy_tasa,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
-```
+El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_tasa_int[1]` y `r Q_greedy_tasa_int[2]`. Su amplitud es de `r Q_greedy_tasa_int[2]-Q_greedy_tasa_int[1]` unidades monetarias, siendo `r round((Q_greedy_tasa_int[2]-Q_greedy_tasa_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)`veces mas grande que el caso ideal.
 
 Si bien es un metodo que en promedio gana una cantidad similar de dinero comparado a la situacion ideal, existe el riesgo de ganar mucho menos que el promedio, ya que en general la estrategia suele usar una misma maquina en casi todo el año y hay una probabilidad no despreciable de elegir la peor de ellas.
+Esta es la razon de porque la amplitud del intervalo es tan grande.
 
 ## Estrategia 3: Greedy con probabilidad a posteriori
 
@@ -434,30 +426,13 @@ Q_greedy_posterior = sort(Exitos_greedy_posterior_totales$x)
 Q_greedy_posterior_int = c(mean(Q_greedy_posterior[25], Q_greedy_posterior[26]), mean(Q_greedy_posterior[975], Q_greedy_posterior[976]))
 
 
-
-med = rbind(colMeans(datos_greedy_posterior_filter[,6:8]), c(median(datos_greedy_posterior_filter[,6]),  median(datos_greedy_posterior_filter[,7]), median(datos_greedy_posterior_filter[,8])))
-row.names(med) = c("Media", "Mediana")
-
-kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
-
-
 ```
 
-En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_posterior` unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_posterior` unidades monetarias en un año. Esto es un `r 100-round(100*Media_greedy_posterior/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_posterior_int[1]` y `r Q_greedy_posterior_int[2]`.
+El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_posterior_int[1]` y `r Q_greedy_posterior_int[2]`.Su amplitud es de `r Q_greedy_posterior_int[2]-Q_greedy_posterior_int[1]` unidades monetarias, siendo `r round((Q_greedy_posterior_int[2]-Q_greedy_posterior_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)`veces mas grande que el caso ideal.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
-
-med_greedy_posterior = rbind(colMeans(datos_greedy_posterior_filter[,6:8]), c(median(datos_greedy_posterior_filter[,6]), median(datos_greedy_posterior_filter[,7]), median(datos_greedy_posterior_filter[,8])))
-row.names(med_greedy_posterior) = c("Media", "Mediana")
-
-kable(round(med_greedy_posterior,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
-```
-
-Esta estragia sera un poco mejor que la anterior debido a que la cola izquierda del histograma es menos densa. Esto se debe a que al principio de cada año se tiene una mejor aproximacion de las probabilidades de éxito al haber utilizado la informacion de sus distribuciones a priori.
+Esta estragia sera un poco mejor que la anterior ya que la cola izquierda del histograma es menos pesada. Esto se debe a que al principio de cada año se tiene una mejor aproximacion de las probabilidades de éxito al haber utilizado la informacion de sus distribuciones a priori. Aun asi, comparada con la situacion ideal, sus ganancias son mas variables, por lo que no es muy recomendable.
 
 ## Estrategia 4: $\epsilon$-greedy (con tasa observada)
 
@@ -609,26 +584,12 @@ Q_e_greedy_int = c(mean(Q_e_greedy[25], Q_e_greedy[26]), mean(Q_e_greedy[975], Q
 ```
 
 
-En promedio, siguiendo esta estrategia, se espera ganar `r Media_e_greedy` unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_e_greedy` unidades monetarias en un año. Esto es un `r 100-round(100*Media_e_greedy/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_e_greedy_int[1]` y `r Q_e_greedy_int[2]`.
+El 95% de las ganancias al final del año estuvieron entre `r Q_e_greedy_int[1]` y `r Q_e_greedy_int[2]`. Su amplitud es de `r Q_e_greedy_int[2]-Q_e_greedy_int[1]` unidades monetarias, siendo `r round((Q_e_greedy_int[2]-Q_e_greedy_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)`veces mas grande que el caso ideal.
 
+El problema de la greedy con tasa observada es, a veces, no utilizar mayoritariamente la maquina con mayor probabilidad de exito. El usar la estrategia completamente al azar esporadicamente, permite explorar las probabilidades de exito de las maquinas para que al utilizar la greedy con tasa observada, esta seleccione la mejor de ellas con mayor regularidad. Comparado con la greedy con probabilidad a posteriori, su ganancia promedio y variabilidad son levemente menores. Aun asi, su intervalo es demasiado amplio en comparacion a la situacion ideal.
 
-El problema de la greedy con tasa observada es, a veces, no utilizar mayoritariamente la maquina con mayor probabilidad de exito. El usar la estrategia completamente al azar esporadicamente, permite explorar las probabilidades de exito de las maquinas para que al utilizar la greedy con tasa observada, esta seleccione la mejor de ellas con mayor regularidad.
-
-
-
-
-
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
-
-med_e_greedy = rbind(colMeans(datos_e_greedy_filter[,6:8]), c(median(datos_e_greedy_filter[,6]), median(datos_e_greedy_filter[,7]), median(datos_e_greedy_filter[,8])))
-row.names(med_e_greedy) = c("Media", "Mediana")
-
-kable(round(med_e_greedy,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
-```
 
 ## Estrategia 5: Softmax
 
@@ -655,15 +616,12 @@ rownames(s) = c("Originales", "Temperatura = 1/25", "Temperatura = 1", "Temperat
 kable(s, col.names = c("Maquina 2 / Maquina 1", "Maquina 2 / Maquina 3")) %>% 
   kable_material(c("striped", "hover"))
 
-
-row.names(med) = c("Media", "Mediana")
-
-kable(med, col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
 ```
 
 Cuando la temperatura crece, la diferencias entre las probabilidades de exito de cada maquina disminuyen mientras que las diferencias aumentan cuando la temperatura disminuye. Cuando la temperatura es alta, se exploran todas las maquinas, mientras que cuando es baja, se explota la que hasta el momento sea la que tenga la mayor probabilidad de exito.
 
+
+Para ver que temperatura seleccionar se grafican las ganacias promedio en 1000 años para distintos valores de la temperatura.
 
 ```{r}
 vector2 = data.frame(matrix(nrow = 50, ncol = 1))
@@ -690,10 +648,11 @@ scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0
   scale_x_continuous(name="Temperatura")+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
-e = xxx$seq[which.max(xxx2$x)]
+temp = xxx2$seq[which.max(xxx2$x)]
+
 ```
 
-
+Queremos que en promedio se gane lo mayor posible. El valor que maximiza las ganancias es `r temp`.
 
 
 
@@ -702,7 +661,8 @@ Se juega un año con esta estrategia y se obtienen los siguites resultados:
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-temperatura = .02
+
+temperatura = temp
 
 datos_softmax_dia = actualizar(366, 1,"softmax", temp = temperatura)
 
@@ -728,7 +688,9 @@ plot2_softmax_dia = ggplot(datos_softmax_dia)+
 grid.arrange(plot1_softmax_dia, plot2_softmax_dia, ncol = 2)
 ```
 
-Posteriors:
+
+En los primeros cinco meses del año, se usa mayoritariamente la maquina 3 pero luego comienza a su vez a utilizar la maquina 2. Esto se debe a que el metodo permite la exploracion de las maquinas que no esta explotando. Al usar la maquina 2, aumenta su probabilidad de exito observada, que aumenta la probalidad de elegirla con el metodo. En el siguiente grafico se puede observar dicho efecto.
+
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
@@ -781,12 +743,12 @@ Pb_softmax_3 =(2+datos_softmax_dia$Maquina3[366]) / (4+datos_softmax_dia$Maquina
 
 ```
 
-1000 años:
+Para observar como varian las ganancias usando este metodo se simularon 1000 años, las cuales arrojaron los siguientes resultados:
 
 ```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-temperatura = .5
+temperatura = temp
 
 datos_softmax_año = actualizar(366, 1000, "softmax", temp = temperatura)
 
@@ -807,6 +769,15 @@ Q_softmax = sort(Exitos_softmax_totales$x)
 
 Q_softmax_int = c(mean(Q_softmax[25], Q_softmax[26]), mean(Q_softmax[975], Q_softmax[976]))
 ```
+
+
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_softmax` unidades monetarias en un año. Esto es un `r 100-round(100*Media_softmax/Media_ideal,2)`% menos que el caso ideal.
+
+El 95% de las ganancias al final del año estuvieron entre `r Q_softmax_int[1]` y `r Q_greedy_posterior_int[2]`. Su amplitud es de `r Q_softmax_int[2]-Q_softmax_int[1]` unidades monetarias, siendo `r round((Q_softmax_int[2]-Q_softmax_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces mas grande que el caso ideal.
+
+
+Su ganancia promedio es menor que todas las estrategias greedy, pero la amplitud de su intervalo es mas baja. Es decir, si una persona quisiera tener mas seguridad sobre la cantidad de unidades monetarias a ganar jugaria esta a las mencionadas. 
+
 
 ## Estrategia 6: Upper-bound
 
@@ -919,18 +890,10 @@ Q_upper = sort(Exitos_upper_totales$x)
 Q_upper_int = c(mean(Q_upper[25], Q_upper[26]), mean(Q_upper[975], Q_upper[976]))
 ```
 
-En promedio, siguiendo esta estrategia, se espera ganar `r Media_upper` unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_upper` unidades monetarias en un año. Esto es un `r 100-round(100*Media_upper/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_upper_int[1]` y `r Q_upper_int[2]`.
+El 95% de las ganancias al final del año estuvieron entre `r Q_upper_int[1]` y `r Q_upper_int[2]`. Su amplitud es de `r Q_upper_int[2]-Q_upper_int[1]` unidades monetarias, siendo `r round((Q_upper_int[2]-Q_upper_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces mas grande que el caso ideal.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
-
-med_upper = rbind(colMeans(datos_upper_filter[,6:8]), c(median(datos_upper_filter[,6]), median(datos_upper_filter[,7]), median(datos_upper_filter[,8])))
-row.names(med_upper) = c("Media", "Mediana")
-
-kable(round(med_upper,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
-
-```
 
 Se puede observar que el histograma de esta estrategia es mucho mas simetrico que el de las tecnicas anteriores que se le parecen. Esto se debe a que cada año la maquina con la que mas veces se suele quedar el metodo es la 2, es decir, la que mayor probabilidad de exito tiene.
 
@@ -1048,19 +1011,34 @@ Q_thompson = sort(Exitos_thompson_totales$x)
 Q_thompson_int = c(mean(Q_thompson[25], Q_thompson[26]), mean(Q_thompson[975], Q_thompson[976]))
 ```
 
-En promedio, siguiendo esta estrategia, se espera ganar `r Media_upper` unidades monetarias en un año.
+En promedio, siguiendo esta estrategia, se espera ganar `r Media_thompson` unidades monetarias en un año. Esto es un `r 100-round(100*Media_thompson/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_upper_int[1]` y `r Q_upper_int[2]`.
+El 95% de las ganancias al final del año estuvieron entre `r Q_thompson_int[1]` y `r Q_thompson_int[2]`. Su amplitud es de `r Q_thompson_int[2]-Q_thompson_int[1]` unidades monetarias, siendo `r round((Q_thompson_int[2]-Q_thompson_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces mas grande que el caso ideal.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 
-med_thompson = rbind(colMeans(datos_thompson_filter[,6:8]), c(median(datos_thompson_filter[,6]), median(datos_thompson_filter[,7]), median(datos_thompson_filter[,8])))
-row.names(med_thompson) = c("Media", "Mediana")
 
-kable(round(med_thompson,2), col.names = c("Maquina 1", "Maquina 2", "Maquina 3")) %>% kable_material(c("striped", "hover"))
+Esta estrategia, como la anterior, tiene un histograma bastante simetrico. Es mejor que los otros metodos parecidos pero es peor que upper bound ya que tiene un promedio de ganancias mas chico, aunque la amplitud de su intervalo sea ligeramente mas pequeño.
 
-```
 
-Esta estrategia, como la anterior, tiene un histograma bastante simetrico. Es mejor que los otros metodos parecidos pero es peor que upper bound ya que tiene un promedio de ganancias mas chico y ambos extremos de los intervalos son menores.
+# Conclusion
 
-Hacer: e, temperatura, caratula, comparacion cuantas veces se elige cada maquina
+En todas las estrategias usadas se vio entrelazado el concepto de explorar o explotar, dandole distintas importancias a cada una. Los mejores metodos son lo que pueden encontrar un equilibrio entre ambos enfoques. Aquel que explore lo justo y necesario para asegurarse de elegir la mejor opcion al momento de explotar. Viendo desde este enfoque los resultados, el mejor metodo entre los utilizados en el informe es el upper bound, siendo este el que mejor supo balancear ambos conceptos dando como consecuencia el mayor promedio de unidades monetarias ganadas y con casi la menor variabilidad entre todos las estrategias.
+Puede existir una mejor estrategia que capture mejor el concepto de "explorar vs explotar".
+
+
+
+
+
+
+
+
+Primera pagina que no tenga numero
+poner tildes
+decir si son metodos bayesianos
+anexo
+
+\newpage
+
+# Anexo
+
+
