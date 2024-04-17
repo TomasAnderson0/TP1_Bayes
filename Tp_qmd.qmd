@@ -1,34 +1,69 @@
 ---
-title: "Análisis de distintas estrategias en el problema Multi-armed Bandit con estadística bayesiana"
-subtitle: "Trabajo Práctico 1"
 format: pdf
-editor: visual
-toc: true
 lang: "es"
-author:
-  - name: Tomas Anderson
-  - name: Alejo Vaschetti
-  - name: Manuel Moresi
+header-includes:
+  - \usepackage{ragged2e}
+  - \usepackage{hyperref}
 ---
 
 
+\Centering
 
+\vspace{3cm}
+
+
+\pagenumbering{gobble}
+
+\vspace{5cm}
+
+\large
+LICENCIATURA EN ESTADÍSTICA
+
+\vspace{1cm}
+
+\large
+"Análisis de distintas estrategias en el problema Multi-armed Bandit con estadística bayesiana" 
+\newline
+\vspace{0.3cm}
+\normalsize
+Trabajo Práctico 1
+
+\vspace{10cm}
+
+\normalsize
+
+
+Autores: Tomás Anderson - Alejo Vaschetti - Manuel Moresi
+
+Docentes: Ignacio Evangelista - Tomás Capretto
+
+17/04/2024
+
+\newpage
+\hypersetup{linkcolor = black}
+\tableofcontents
+
+
+\newpage
+\pagenumbering{arabic}
+
+\RaggedRight
 \newpage
 
 # Introduccion
 
-El humano tiene que enfrentarse a una gran cantidad de decisiones en su vida diaria. Algunas pueden ser irrelevantes, como la elección de para qué lado dormirse o cuál es el primer pie al que se le pone la media al vestirse. En cambio, otros dilemas pueden ser de una importancia superior en la que se espera un mayor uso de racionalidad. Por ejemplo, al terminar la escuela, ¿Empezar a trabajar o estudiar?, ¿Qué carrera seguir?, ¿Salir de fiesta con tanta lluvia el fin de semana?. Estos problemas de decisión que conllevan un poco más de esfuerzo pueden ser analizados de forma dicotómica, basar la elección en base a la seguridad de lo familiar y el conocimiento previo o decantarse por lo desconocido y arriesgado pero con posibles recompensas mayores. Usando los ejemplos anteriores, ¿Seguir una carrera que se adecúe a las técnicas propias o elegir una carrera de conocimientos inexplorados?,¿Quedarse en casa viendo una serie o salir de fiesta pudiendo ser una noche inolvidable o una desastrosa?. Este dilema se lo conoce como "explorar vs. explotar" en el cual el primero hace referencia a la promesa de lo desconocido y lo segundo a la seguridad de lo familiar.
+El humano tiene que enfrentarse a una gran cantidad de decisiones en su vida diaria. Algunas pueden ser irrelevantes, como la elección de para qué lado dormirse o cuál es el primer pie al que se le pone la media al vestirse. En cambio, otros dilemas pueden ser de una importancia superior en la que se espera un mayor uso de racionalidad. Por ejemplo, al terminar la escuela, ¿empezar a trabajar o estudiar?, ¿qué carrera seguir?, ¿salir de fiesta con tanta lluvia el fin de semana?. Estos problemas de decisión que conllevan un poco más de esfuerzo pueden ser analizados de forma dicotómica, basar la elección en base a la seguridad de lo familiar y el conocimiento previo o decantarse por lo desconocido y arriesgado pero con posibles recompensas mayores. Usando los ejemplos anteriores, ¿seguir una carrera que se adecúe a las técnicas propias o elegir una carrera de conocimientos inexplorados?, ¿quedarse en casa viendo una serie o salir de fiesta pudiendo ser una noche inolvidable o una desastrosa?. Este dilema se lo conoce como "explorar vs. explotar" en el cual el primero hace referencia a la promesa de lo desconocido y lo segundo a la seguridad de lo familiar.
 
-En este informe se analizará una situación hipotética que plantea la disyuntiva de "explorar vs. explotar". El problema del *Multi-armed Bandit* se trata de imaginarse una situación en donde se tienen varias máquinas tragamonedas, es decir, máquinas en las que se hace girar unos rodillos con figuras en cada cara y en el caso de coincidir la figura se gana dinero, en caso contrario, no se gana nada. Para simplificar, se analizará el problema con el caso de 3 máquinas con distintas probabilidad de ganar, $0.3$, $0.45$ y $0.55$ respectivamente, y donde jugar en la máquina no cuesta dinero. Cada día se puede jugar en una única máquina una sola vez y el objetivo será ganar la mayor cantidad de unidades monetarias en un año bisiesto (366 días) idealmente descubriendo la máquina con mayor probabilidad de éxito. Este informe busca comparar distintas estrategias que tratarán de encontrar un equilibrio en el dilema "explorar vs. explotar".
+En este informe se analizará una situación hipotética que plantea la disyuntiva de "explorar vs. explotar". El problema del *Multi-armed Bandit* se trata de imaginarse una situación en donde se tienen varias máquinas tragamonedas, es decir, máquinas en las que se hace girar unos rodillos con figuras en cada cara y en el caso de coincidir la figura se gana dinero, en caso contrario, no se gana nada. Para simplificar, se analizará el problema con el caso de 3 máquinas con distintas probabilidad de ganar, $0.3$, $0.45$ y $0.55$ respectivamente, y donde jugar en las máquinas no cuesta dinero. Cada día se puede jugar en una única máquina una sola vez y el objetivo será ganar la mayor cantidad de unidades monetarias en un año bisiesto (366 días) idealmente descubriendo la máquina con mayor probabilidad de éxito. Este informe busca comparar distintas estrategias que tratarán de encontrar un equilibrio en el dilema "explorar vs. explotar".
 
 
 # Desarrollo
 
-Para la resolución de las incógnitas planteadas en la introducción se usarán herramientas correspondientes al análisis bayesiano donde la creencia a priori para las probabilidades de éxito de cada máquina a principio de año toma una distribución Beta$(2,2)$. Al considerar la variable como ganar o no al jugar una máquina, esta toma una distribución Binomial$(1,p)$ por lo que la ditribución a posteriori tiene forma de Beta$(2+1,2)$ si la observación fue un éxito y Beta$(2,2+1)$ en el caso de perder. Por la secuencialidad de las técnicas bayesianas, esta distribución a posteriori pasa a ser la probabilidad a priori en el siguiente día, de esta manera se puede ir actualizando día a día la creencia sobre las probabilidades de éxito de cada máquina.
+Para la resolución de las incógnitas planteadas en la introducción se usan herramientas correspondientes al análisis bayesiano, donde la creencia a priori para las probabilidades de éxito de cada máquina a principio de año toma una distribución Beta$(2,2)$. Al considerar la variable ganar o no al jugar una máquina, esta toma una distribución Binomial$(1,p)$ donde $p$ es la probabilidad de éxito de cada máquina, por lo que la ditribución a posteriori de $p$ luego de un día tiene forma de Beta$(2+1,2)$ si la observación fue un éxito y Beta$(2,2+1)$ en el caso de perder. Por la secuencialidad de las técnicas bayesianas, esta distribución a posteriori pasa a ser la probabilidad a priori en el siguiente día, de esta manera se puede ir actualizando día a día la creencia sobre las probabilidades de éxito de cada máquina.
 
-Se comparan siete estrategias utilizándo simulaciones de, al principio un año para cada una y luego de 1000 años para ver las posibles variaciones que pueda llegar a tener cada método debido a la naturaleza aleatoria de las máquinas tragamonedas. Se programa una función capaz de elegir una máquina siguiendo la estrategia seleccionada, devolver un resultado y actualizar las creencias sobre las probabilidades de éxito y es la que se usará para realizar las simulaciones.
+Se comparan siete estrategias utilizándo simulaciones de, al principio un año para cada una y luego de 1000 años para ver las posibles variaciones que pueda llegar a tener cada método debido a la naturaleza aleatoria de las máquinas tragamonedas. Se programa una función capaz de elegir una máquina siguiendo la estrategia seleccionada, devolver un resultado y actualizar las creencias sobre las probabilidades de éxito. Esta es la que se usa para realizar las simulaciones.
 
-Para tener un punto de referencia con las que se pueda comparar cada método se procede a continuación el planteo de un caso irreal e idóneo en el que se consigue la mayor cantidad de éxitos en un año.
+Para tener un punto de referencia con las que se pueda comparar cada método a continuación se plantea un caso irreal e idóneo en el se conocen las probabilidades de éxito de cada máquina y se explota que más gana.
 
 
 
@@ -39,7 +74,6 @@ library(gridExtra)
 library(ggpubr)
 library(knitr)
 library(kableExtra)
-source("Funciones.R")
 prob=c(.3, .55, .45)
 tema = theme(panel.grid = element_line(color = "lightgrey"),
              panel.background = element_rect(fill = "#f8f8f8"),
@@ -47,15 +81,149 @@ tema = theme(panel.grid = element_line(color = "lightgrey"),
 colores=c("#ffe500", "#ffa200", "#ff8000", "#ff5500", "#ff3600", "#ff0000", "#ffc500")
 ```
 
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+# -------------- Cual Maximo ---------------------------------------------------
+cual_maximo = function(max_vec){
+  maximo = which(max(max_vec) == max_vec)
+  if (length(maximo) == 1) {
+    return(maximo)
+  } else {return(sample(maximo, 1))}
+}
+
+
+# -------------- Estrategia random ---------------------------------------------
+
+random = function(y, temp, e){
+  cual = floor(runif(1,1,4))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)}
+
+# ------------- Estrategia Softmax ---------------------------------------------
+
+softmax = function(tasas, temp, e){
+  p = exp(tasas / temp) / sum(exp(tasas / temp))
+  for (k in 1:length(p)) {
+    if (is.na(p[k])) {
+      p[k] = 0
+    }
+  }
+  return(p)}
+
+soft = function(y, temp, e){
+  tasa = y[1:3] / y[4:6]
+  for (k in 1:length(tasa)) {
+    if (is.na(tasa[k])) {
+      tasa[k] = 0
+    }
+  }
+  p = softmax(tasa, temp)
+  if (sum(p) == 0) {
+    p = rep(1/3,3)
+  }
+  cual = sample(c(1, 2, 3), size = 1, prob = p)
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+# ------------------------ Estrategia Thompson Sampling ------------------------
+
+thompson = function(y, temp, e){
+  maquina1 = rbeta(1, 2 + y[1], 2 + y[4] - y[1])
+  maquina2 = rbeta(1, 2 + y[2], 2 + y[5] - y[2])
+  maquina3 = rbeta(1, 2 + y[3], 2 + y[6] - y[3])
+  cual = cual_maximo(c(maquina1, maquina2, maquina3))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+# ------------------------ Estrategia Upper-Bound ------------------------------
+
+upper = function(y, temp, e){
+  maquina1 = qbeta(.975, 2 + y[1], 2 + y[4] - y[1])
+  maquina2 = qbeta(.975, 2 + y[2], 2 + y[5] - y[2])
+  maquina3 = qbeta(.975, 2 + y[3], 2 + y[6] - y[3])
+  cual = cual_maximo(c(maquina1, maquina2, maquina3))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+# ------------------------ Estrategia Greedy Posterior -------------------------
+
+greedy_posterior = function(y, temp, e){
+  maquina1 = (2 + y[1]) / (4 + y[4])
+  maquina2 = (2 + y[2]) / (4 + y[5])
+  maquina3 = (2 + y[3]) / (4 + y[6])
+  cual = cual_maximo(c(maquina1, maquina2, maquina3)) 
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+# ------------------------ Estrategia Greedy tasa ------------------------------
+
+greedy_tasa = function(y, temp, e){
+  if (y[1] == 0) {
+    vector = c(rbinom(1, 1, prob[1]), 1)
+    return(vector)
+  }
+  if (y[2] == 0) {
+    vector = c(rbinom(1, 1, prob[2]), 2)
+    return(vector)
+  }
+  if (y[3] == 0) {
+    vector = c(rbinom(1, 1, prob[3]), 3)
+    return(vector)
+  }   
+  cual = cual_maximo(c(y[1:3]) / c(y[4:6]))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+# ------------------------- Estrategia E-Greedy --------------------------------
+
+e_greedy = function(y, temp, e){
+  which = rbinom(1, 1, e)
+  if (which == 0) {
+    return(greedy_tasa(y, temp ,e))
+  } else {
+    return(random(y, temp, e))
+    }
+}
+
+# ------------------------------------------------------------------------------
+# ------------------------- Función que converge las anteriores ----------------
+# ------------------------------------------------------------------------------
+
+actualizar = function(dias = 366, muestras = 1, metodo = "random", temp = 1, e = .5){
+  lista = list(random = random, greedy_tasa = greedy_tasa, greedy_posterior = greedy_posterior,
+             e_greedy = e_greedy, softmax = soft, upper = upper, thompson = thompson)
+  metodo = lista[[metodo]]
+  matriz = matrix(0, dias*muestras, 10)
+  for (j in 1:muestras) {
+    y = c(0, 0, 0, 0, 0, 0, j)
+    for (i in 1:dias) {
+      x=metodo(y, temp, e)
+      y[x[2]] = y[x[2]] + x[1]
+      y[x[2]+3] = y[x[2] + 3] + 1
+      matriz[i+(dias*(j-1)),] = c(x, y, i)
+    }
+  }
+  datos = as.data.frame(matriz)
+  colnames(datos) = c("Exito", "Maquina", "Maquina1", "Maquina2", "Maquina3", "Maquina1Total",
+                      "Maquina2Total", "Maquina3Total", "Muestra", "Dia")
+  return(datos)
+}
+```
+
+
 ## Situación ideal
 
-La situación ideal seria conocer de antemano cual máquina es la que tiene la mayor probabilidad de ganar y jugar siempre con ella. Esta sería la mejor forma de ganar dinero, por lo que una buena estrategia tiene que asemejarse a dicha situación.
+La situación ideal sería conocer de antemano cual máquina es la que tiene la mayor probabilidad de ganar y jugar siempre con ella. Esta sería la mejor forma de ganar dinero, por lo que una buena estrategia tendría que asemejarse a dicha situación.
 
-Para ver la cantidad de dinero que gana en promedio este método se simulan a 1000 personas jugando 1 año utilizándolo.
+Para ver la cantidad de dinero que gana en promedio este método se simulan a 1000 años siguiéndolo.
 
-Estos fueron los resultados:
+Estos son los resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 datos = matrix(rbinom(366000, 1, prob[2]), nrow = 1000, ncol = 366, byrow = T)
 ideal = as.data.frame(rowSums(datos))
@@ -63,8 +231,7 @@ colnames(ideal) = "x"
 
 ggplot(ideal, aes(x))+geom_histogram(fill = "#FF8F54", color = "black",binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,175), breaks = seq(0,175,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(168,232,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(168,232,8), name = "Unidades monetarias")+ tema
 
 Media_ideal = mean(rowSums(datos))
 Q_ideal = sort(rowSums(datos))
@@ -73,17 +240,20 @@ Q_ideal_int = c(mean(Q_ideal[25], Q_ideal[26]), mean(Q_ideal[975], Q_ideal[976])
 
 En este modus operandi una persona que juege un año se espera que va a ganar alrededor de `r Media_ideal` unidades monetarias.
 
-En el 95% de los años simulados las ganancias totales se encontraron entre `r Q_ideal_int[1]` y `r Q_ideal_int[2]` unidades monetarias. Dicho intervalo, y los que seran presentados en las próximas estrategias, se encuentran entre el 2,5% y el 97,5% de las ganancias totales del método ordenadas de menor a mayor. La amplitud del intervalo es de `r Q_ideal_int[2]-Q_ideal_int[1]` unidades monetarias.
+En el 95% de los años simulados las ganancias totales se encuentran entre `r Q_ideal_int[1]` y `r Q_ideal_int[2]` unidades monetarias. Dicho intervalo, y los presentados en las próximas estrategias, se encuentran entre el 2,5% y el 97,5% de las ganancias totales ordenadas de menor a mayor. La amplitud del intervalo es de `r Q_ideal_int[2]-Q_ideal_int[1]`.
 
-Para ver que tan beneficioso es cada estrategia, se comparan la cantidad de veces que se gana en promedio esperando que se acerque lo máximo posible a esta forma de jugar. Además, se contrastan las amplitudes de los intervalos propuestos.
+Para ver que tan beneficiosa es cada estrategia, se comparan la cantidad de veces que se gana en promedio, esperando que se acerque lo máximo posible a esta forma de jugar. Además, se contrastan las amplitudes de los intervalos propuestos.
 
 ## Estrategia 1: Completamente al azar
 
-Esta estrategia consiste en elegir cada día al azar qué máquina jugar, teniendo las tres la misma probabilidad de ser selectas. Esta es la estrategia mas basica, ya que no requiere ningun tipo de informacion previa ni evoluciona en el tiempo.
+Esta estrategia consiste en elegir cada día al azar qué máquina jugar, teniendo las tres la misma probabilidad de ser selectas. Esta es la estrategia más básica, ya que no requiere ningun tipo de información previa ni evoluciona en el tiempo. A pesar de lo planteado en la introducción, este no es una método bayesiano, ya que no utiliza de ninguna manera la regla de Bayes para la elección de maquinas.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap="Evolución diaria del uso de las máquinas y la ganancia generada"}
+
+
+
 set.seed(69)
 
 datos_random_dia = actualizar(366, 1)
@@ -110,9 +280,9 @@ plot2_random_dia = ggplot(datos_random_dia)+
 grid.arrange(plot1_random_dia, plot2_random_dia, ncol = 2)
 ```
 
-La cantidad de veces que se juegan las 3 máquinas son similares, y la diferencia entre ellas se debe puramente al azar. Este hecho impacta en la evolución de la creencia sobre la probabilidad de éxito de cada máquina, como se ve a continuación.
+La cantidad de veces que se juegan las 3 máquinas son similares, y la diferencia entre ellas se debe puramente al azar. Este hecho repercute en la evolución de la creencia sobre la probabilidad de éxito de cada máquina de la siguiente manera.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_random_post = matrix(seq(0, 1, .001), nrow = 3003)
 datos_random_post = cbind(datos_random_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -131,7 +301,6 @@ Maquinas_random = cbind(Maquinas_random, matrix(rep(c("Maquina 1", "Maquina 2", 
 datos_random_post = cbind(datos_random_post, Maquinas_random)
 colnames(datos_random_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
 
 plot3_random_dia = ggplot(datos_random_post, aes(col = factor(Maquina))) +
@@ -153,21 +322,13 @@ plot3_random_dia = ggplot(datos_random_post, aes(col = factor(Maquina))) +
 
 plot3_random_dia
 
-
-Pb_random_1 = (2+datos_random_dia$Maquina1[366]) / (4+datos_random_dia$Maquina1Total[366])
-Pb_random_2 =(2+datos_random_dia$Maquina2[366]) / (4+datos_random_dia$Maquina2Total[366])
-Pb_random_3 =(2+datos_random_dia$Maquina3[366]) / (4+datos_random_dia$Maquina3Total[366])
-
-
-
-
 ```
 
-Al jugarse una cantidad similar de veces en cada máquina la creencia se concentra en igual medida alrededor de los valores de las probabilidades de éxito de cada una. Estos son `r Pb_random_1`, `r Pb_random_2` y `r Pb_random_3` para la máquina 1, 2 y 3 respectivamente.
+Al jugarse una cantidad similar de veces en cada máquina la creencia se concentra en igual medida alrededor de los valores de las probabilidades de éxito de cada una.
 
 Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 datos_random_año = actualizar(366, 1000)
@@ -179,8 +340,7 @@ colnames(Exitos_random_totales) = "x"
 
 ggplot(Exitos_random_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), breaks = seq(0,175,25), limits = c(0,175), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(128,192,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(128,192,8), name = "Unidades monetarias")+ tema
 
 Media_random = round(mean(Exitos_random_totales$x),2)
 
@@ -191,17 +351,17 @@ Q_random_int = c(mean(Q_random[25], Q_random[26]), mean(Q_random[975], Q_random[
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_random` unidades monetarias en un año. Esto es un `r 100-round(100*Media_random/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_random_int[1]` y `r Q_random_int[2]`. Su amplitud es de `r Q_random_int[2]-Q_random_int[1]` unidades monetarias, siendo `r (Q_random_int[2]-Q_ideal_int[1])-(Q_random_int[2]-Q_ideal_int[1])` mas grande que el del caso ideal, siendo muy parecidos entre si.
+El 95% de las ganancias al final del año estuvieron entre `r Q_random_int[1]` y `r Q_random_int[2]`. Su amplitud es de `r Q_random_int[2]-Q_random_int[1]` unidades monetarias, siendo `r round((Q_random_int[2]-Q_random_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces el caso ideal, resultando muy parecidos entre sí.
 
-El promedio de ganancias al final del año es sustancialmente mas chico que el de la situacion ideal y los intervalos siquiera se superponen. Se puede pensar que esta estrategia no es recomendable al diferir tanto de un resultado ideal.
+El promedio de ganancias al final del año es sustancialmente más chico que el de la situacion ideal y los intervalos no se superponen. Se puede pensar que esta estrategia no es recomendable al diferir tanto de un resultado ideal.
 
 ## Estrategia 2: Greedy con tasa observada
 
-La maquina que esta estrategia selecciona en un cierto dia es aquella que tenga la mayor probabilidad de éxito observada hasta el momento. Como al empezar el año no se tiene ninguna informacion sobre la probabilidad de éxito de cada maquina, se decide jugar cada una por separado hasta que todas tengan su primer éxito. Si las probabilidades de éxito coinciden en algunas maquinas se elige una de ellas aleatoriamente.
+La máquina que esta estrategia selecciona en un cierto día es aquella que tenga la mayor probabilidad de éxito observada hasta el momento. Como al empezar el año no se tiene ninguna información sobre la probabilidad de éxito de cada máquina, se decide jugar cada una por separado hasta que todas tengan su primer éxito. Si coinciden en algunas máquinas se elige una de ellas aleatoriamente. Al no hacer uso de las probabilidades a priori o posteriori, este método no se considera bayesiano.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Evolución diaria del uso de las máquinas y la ganancia generada"}
 set.seed(69)
 
 datos_greedy_tasa_dia = actualizar(366, 1,"greedy_tasa")
@@ -228,9 +388,9 @@ plot2_greedy_tasa_dia = ggplot(datos_greedy_tasa_dia)+
 grid.arrange(plot1_greedy_tasa_dia, plot2_greedy_tasa_dia, ncol = 2)
 ```
 
-En este año se usa casi exclusivamente la maquina 2 y apenas se utilizan las otras dos. Esto pasa porque las probabilidades de exitos iniciales observadas son muy variables, por lo que la primera maquina en tener varios fracasos va a tener una probabilidad muy chica y se dejara de usar. Esto impacta a la creencia sobre la probabilidad de éxito de cada máquina de la siguiente manera.
+En este año se usa casi exclusivamente la maquina 2 y apenas se utilizan las otras dos. Esto pasa porque las probabilidades de éxito iniciales observadas son muy variables, por lo que la primera maquina en tener varios fracasos va a tener una probabilidad muy chica y se dejara de usar. Esto afecta a la creencia sobre la probabilidad de éxito de cada máquina de la siguiente manera.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_greedy_tasa_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_greedy_tasa_post = cbind(datos_greedy_tasa_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -249,7 +409,7 @@ Maquinas_greedy_tasa = cbind(Maquinas_greedy_tasa, matrix(rep(c("Maquina 1", "Ma
 datos_greedy_tasa_post = cbind(datos_greedy_tasa_post, Maquinas_greedy_tasa)
 colnames(datos_greedy_tasa_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
+
 
 
 plot3_greedy_tasa_dia = ggplot(datos_greedy_tasa_post, aes(col = factor(Maquina))) +
@@ -272,20 +432,13 @@ plot3_greedy_tasa_dia = ggplot(datos_greedy_tasa_post, aes(col = factor(Maquina)
 plot3_greedy_tasa_dia
 
 
-Pb_greedy_tasa_1 = (2+datos_greedy_tasa_dia$Maquina1[366]) / (4+datos_greedy_tasa_dia$Maquina1Total[366])
-Pb_greedy_tasa_2 =(2+datos_greedy_tasa_dia$Maquina2[366]) / (4+datos_greedy_tasa_dia$Maquina2Total[366])
-Pb_greedy_tasa_3 =(2+datos_greedy_tasa_dia$Maquina3[366]) / (4+datos_greedy_tasa_dia$Maquina3Total[366])
-
-
-
-
 ```
 
-La creencia sobre la probabilidad de exito de la maquina 2 va a ser muy precisa, al tener muchas muestras de ella, y las demas seran muy parecidas a la suposicion inical.
+La creencia sobre la probabilidad de éxito de la máquina 2 va a ser muy precisa, al tener muchas muestras de ella, y las demas seran muy parecidas a la suposición inical.
 
 Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 datos_greedy_tasa_año = actualizar(366, 1000, "greedy_tasa")
@@ -297,8 +450,7 @@ colnames(Exitos_greedy_tasa_totales) = "x"
 
 ggplot(Exitos_greedy_tasa_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,125), breaks = seq(0,125,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(96,232,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(96,232,8), name = "Unidades monetarias")+ tema
 
 Media_greedy_tasa = round(mean(Exitos_greedy_tasa_totales$x),2)
 
@@ -309,18 +461,18 @@ Q_greedy_tasa_int = c(mean(Q_greedy_tasa[25], Q_greedy_tasa[26]), mean(Q_greedy_
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_tasa` unidades monetarias en un año. Esto es un `r 100-round(100*Media_greedy_tasa/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_tasa_int[1]` y `r Q_greedy_tasa_int[2]`. Su amplitud es de `r Q_greedy_tasa_int[2]-Q_greedy_tasa_int[1]` unidades monetarias, siendo `r round((Q_greedy_tasa_int[2]-Q_greedy_tasa_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)`veces mas grande que el caso ideal.
+El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_tasa_int[1]` y `r Q_greedy_tasa_int[2]`. Su amplitud es de `r Q_greedy_tasa_int[2]-Q_greedy_tasa_int[1]` unidades monetarias, siendo `r round((Q_greedy_tasa_int[2]-Q_greedy_tasa_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces más grande que el caso ideal.
 
-Si bien es un metodo que en promedio gana una cantidad similar de dinero comparado a la situacion ideal, existe el riesgo de ganar mucho menos que el promedio, ya que en general la estrategia suele usar una misma maquina en casi todo el año y hay una probabilidad no despreciable de elegir la peor de ellas.
+Si bien es un método que en promedio gana una cantidad similar de dinero comparado a la situación ideal, existe el riesgo de ganar mucho menos que el promedio, ya que en general la estrategia suele usar una misma máquina en casi todo el año y hay una probabilidad no despreciable de elegir la peor de ellas.
 Esta es la razon de porque la amplitud del intervalo es tan grande.
 
 ## Estrategia 3: Greedy con probabilidad a posteriori
 
-En esta estrategia, la maquina a elegir en cada dia es aquella que, hasta el momento, tenga la mayor esperanza entre las distribuciones a posteriori de las probabilidades de éxito. Si las maquinas tienen esperanzas iguales entonces se elige una de ellas aleatoriamente.
+En esta estrategia, la máquina a elegir en cada día es aquella que, hasta el momento, tenga la mayor esperanza entre las distribuciones a posteriori de las probabilidades de éxito. Si las máquinas tienen esperanzas iguales entonces se elige una de ellas aleatoriamente. Este sí es un método bayesiano, ya que hace uso de las distribuciones a priori y actualiza secuencialmente las creencias sobre las distribuciones de las probabilidades de éxito de cada máquina.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Evolución diaria del uso de las máquinas y la ganancia generada"}
 set.seed(69)
 
 datos_greedy_posterior_dia = actualizar(366, 1,"greedy_posterior")
@@ -347,9 +499,9 @@ plot2_greedy_posterior_dia = ggplot(datos_greedy_posterior_dia)+
 grid.arrange(plot1_greedy_posterior_dia, plot2_greedy_posterior_dia, ncol = 2)
 ```
 
-La seleccion de las maquinas en el año simulado es notablemente similar a la estrategia anterior. La unica diferencia es que las maquinas 1 y 3 se usaron un poco mas al principio del año, aunque sea dificil de ver.
+La seleccion de las máquinas en el año simulado es notablemente similar a la estrategia anterior. La unica diferencia es que las máquinas 1 y 3 se usan un poco mas al principio del año, aunque sea dificil de ver.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_greedy_posterior_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_greedy_posterior_post = cbind(datos_greedy_posterior_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -368,7 +520,6 @@ Maquinas_greedy_posterior = cbind(Maquinas_greedy_posterior, matrix(rep(c("Maqui
 datos_greedy_posterior_post = cbind(datos_greedy_posterior_post, Maquinas_greedy_posterior)
 colnames(datos_greedy_posterior_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
 
 plot3_greedy_posterior_dia = ggplot(datos_greedy_posterior_post, aes(col = factor(Maquina))) +
@@ -390,21 +541,13 @@ plot3_greedy_posterior_dia = ggplot(datos_greedy_posterior_post, aes(col = facto
 
 plot3_greedy_posterior_dia
 
-
-Pb_greedy_posterior_1 = (2+datos_greedy_posterior_dia$Maquina1[366]) / (4+datos_greedy_posterior_dia$Maquina1Total[366])
-Pb_greedy_posterior_2 =(2+datos_greedy_posterior_dia$Maquina2[366]) / (4+datos_greedy_posterior_dia$Maquina2Total[366])
-Pb_greedy_posterior_3 =(2+datos_greedy_posterior_dia$Maquina3[366]) / (4+datos_greedy_posterior_dia$Maquina3Total[366])
-
-
-
-
 ```
 
-Este metodo genera muchas observaciones de una maquina e ignora las demas, debido a su parecido con la estrategia anterior, por ende, la precision sobre la creencia de las probabilidades de exito sera grande para una maquina y chica en las otras.
+Este método genera muchas observaciones de una máquina e ignora las demás, debido a su parecido con la estrategia anterior, por ende, la precision sobre la creencia de las probabilidades de éxito sera grande para una máquina y chica en las otras.
 
 Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 datos_greedy_posterior_año = actualizar(366, 1000, "greedy_posterior")
@@ -416,8 +559,7 @@ colnames(Exitos_greedy_posterior_totales) = "x"
 
 ggplot(Exitos_greedy_posterior_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 125)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
 
 Media_greedy_posterior = round(mean(Exitos_greedy_posterior_totales$x),2)
 
@@ -430,15 +572,15 @@ Q_greedy_posterior_int = c(mean(Q_greedy_posterior[25], Q_greedy_posterior[26]),
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_greedy_posterior` unidades monetarias en un año. Esto es un `r 100-round(100*Media_greedy_posterior/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_posterior_int[1]` y `r Q_greedy_posterior_int[2]`.Su amplitud es de `r Q_greedy_posterior_int[2]-Q_greedy_posterior_int[1]` unidades monetarias, siendo `r round((Q_greedy_posterior_int[2]-Q_greedy_posterior_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)`veces mas grande que el caso ideal.
+El 95% de las ganancias al final del año estuvieron entre `r Q_greedy_posterior_int[1]` y `r Q_greedy_posterior_int[2]`. Su amplitud es de `r Q_greedy_posterior_int[2]-Q_greedy_posterior_int[1]` unidades monetarias, siendo `r round((Q_greedy_posterior_int[2]-Q_greedy_posterior_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces más grande que el caso ideal.
 
-Esta estragia sera un poco mejor que la anterior ya que la cola izquierda del histograma es menos pesada. Esto se debe a que al principio de cada año se tiene una mejor aproximacion de las probabilidades de éxito al haber utilizado la informacion de sus distribuciones a priori. Aun asi, comparada con la situacion ideal, sus ganancias son mas variables, por lo que no es muy recomendable.
+Esta estragia es un poco mejor que la anterior ya que la cola izquierda del histograma es menos pesada. Esto se debe a que al principio de cada año se tiene una mejor aproximación de las probabilidades de éxito al haber utilizado la información de sus distribuciones a priori. Aun asi, comparada con la situación ideal, sus ganancias son muy variables, por lo que no es muy recomendable.
 
 ## Estrategia 4: $\epsilon$-greedy (con tasa observada)
 
-Esta estrategia es una combinacion de otras dos anteriores, la greedy con tasa observada y la completamente al azar. Se elige utlizar la primera mencionada con una probabilidad de $1 - \epsilon$ y la segunda con una probabilidad de $\epsilon$. Mientras mas cerca este $\epsilon$ de 1, se parecera mas a la completamente al azar y mas cerca este del 0 a la greedy con tasa observada. Debido a que uno decide que valor asignarle a $\epsilon$, se realiza un analisis previo para obtener su mejor valor.
+Esta estrategia es una combinación de otras dos anteriores, la greedy con tasa observada y la completamente al azar. Se elige utlizar el primer método mencionado con una probabilidad de $1 - \epsilon$ y el segundo con una probabilidad de $\epsilon$. Mientras más cerca esté $\epsilon$ de 1, más se parece al completamente al azar y mientras más cerca esté del 0, al greedy con tasa observada. Es decir, a valores chicos de $\epsilon$ se prioriza el concepto de explotación, y a valores más grandes le da una mayor importancia a la exploración. Debido a que uno decide qué número asignarle a $\epsilon$, se realiza un análisis previo para obtener su mejor valor. No es un una estrategia que use técnicas bayesianas, ya que es una combinación de dos métodos que no las utilizan.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap = "Ganancia promedio para distintos valores de ε"}
 vector = data.frame(matrix(nrow = 101, ncol = 1))
 
 for (i in 0:100) {
@@ -459,17 +601,17 @@ ggplot(xxx)+geom_line(aes(x = seq, y = x), color = "red")+
 tema+
 scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0,280))+
   scale_x_continuous(name="Epsilon",breaks = seq(0,1,.1))+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.85,.85), legend.background = element_blank(), legend.key = element_blank())
 
 e = xxx$seq[which.max(xxx$x)]
 ```
 
-Queremos que en promedio se gane lo mayor posible. El valor que maximiza las ganancias es `r e`.
+
+Se quiere ganar en promedio lo mayor posible. El valor de $\epsilon$ que maximiza las ganancias es `r e`.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Evolución diaria del uso de las máquinas y la ganancia generada"}
 set.seed(69)
 
 epsilon = e
@@ -498,10 +640,10 @@ plot2_e_greedy_dia = ggplot(datos_e_greedy_dia)+
 grid.arrange(plot1_e_greedy_dia, plot2_e_greedy_dia, ncol = 2)
 ```
 
-En el primer mes de juego, se decide cual es la maquina con mayor probabilidad de exito y luego se utiliza mayoritariamente una sola maquina hasta el final del año. La maquina 1 y 3 se utilizan en el resto del año solo cuando se usa la estrategia completamente al azar.
+En el primer mes de juego, se decide cual es la máquina con mayor probabilidad de éxito y luego se utiliza mayoritariamente una sola hasta el final del año. La máquina 1 y 3 se utilizan en el resto del año solo cuando se emplea la estrategia completamente al azar.
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_e_greedy_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_e_greedy_post = cbind(datos_e_greedy_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -520,7 +662,7 @@ Maquinas_e_greedy = cbind(Maquinas_e_greedy, matrix(rep(c("Maquina 1", "Maquina 
 datos_e_greedy_post = cbind(datos_e_greedy_post, Maquinas_e_greedy)
 colnames(datos_e_greedy_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
+
 
 
 plot3_e_greedy_dia = ggplot(datos_e_greedy_post, aes(col = factor(Maquina))) +
@@ -542,23 +684,15 @@ plot3_e_greedy_dia = ggplot(datos_e_greedy_post, aes(col = factor(Maquina))) +
 
 plot3_e_greedy_dia
 
-
-Pb_e_greedy_1 = (2+datos_e_greedy_dia$Maquina1[366]) / (4+datos_e_greedy_dia$Maquina1Total[366])
-Pb_e_greedy_2 =(2+datos_e_greedy_dia$Maquina2[366]) / (4+datos_e_greedy_dia$Maquina2Total[366])
-Pb_e_greedy_3 =(2+datos_e_greedy_dia$Maquina3[366]) / (4+datos_e_greedy_dia$Maquina3Total[366])
-
-
-
-
 ```
 
 
-La precision de la creencia de la maquina 2 es alta, ya que es la que se utiliza con mas frecuencia. La de las demas luego de los primeros meses no cambia mucho.
+La precisión de la creencia de la máquina 2 es alta, ya que es la que se utiliza con mayor frecuencia. Las demás, luego de los primeros meses, no cambia mucho.
 
 
 Las simulaciones de los 1000 años arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 epsilon = e
@@ -573,8 +707,7 @@ colnames(Exitos_e_greedy_totales) = "x"
 
 ggplot(Exitos_e_greedy_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 150), breaks = seq(0, 150, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
 
 Media_e_greedy = round(mean(Exitos_e_greedy_totales$x),2)
 
@@ -586,22 +719,23 @@ Q_e_greedy_int = c(mean(Q_e_greedy[25], Q_e_greedy[26]), mean(Q_e_greedy[975], Q
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_e_greedy` unidades monetarias en un año. Esto es un `r 100-round(100*Media_e_greedy/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_e_greedy_int[1]` y `r Q_e_greedy_int[2]`. Su amplitud es de `r Q_e_greedy_int[2]-Q_e_greedy_int[1]` unidades monetarias, siendo `r round((Q_e_greedy_int[2]-Q_e_greedy_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)`veces mas grande que el caso ideal.
+El 95% de las ganancias al final del año estuvieron entre `r Q_e_greedy_int[1]` y `r Q_e_greedy_int[2]`. Su amplitud es de `r Q_e_greedy_int[2]-Q_e_greedy_int[1]` unidades monetarias, siendo `r round((Q_e_greedy_int[2]-Q_e_greedy_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces el caso ideal.
 
-El problema de la greedy con tasa observada es, a veces, no utilizar mayoritariamente la maquina con mayor probabilidad de exito. El usar la estrategia completamente al azar esporadicamente, permite explorar las probabilidades de exito de las maquinas para que al utilizar la greedy con tasa observada, esta seleccione la mejor de ellas con mayor regularidad. Comparado con la greedy con probabilidad a posteriori, su ganancia promedio y variabilidad son levemente menores. Aun asi, su intervalo es demasiado amplio en comparacion a la situacion ideal.
+El problema de la greedy con tasa observada es, a veces, no utilizar mayoritariamente la máquina con mayor probabilidad de éxito. El usar la estrategia completamente al azar esporádicamente, permite explorar las probabilidades de éxito de las máquinas para que al utilizar la greedy con tasa observada, esta seleccione la mejor de ellas con mayor regularidad. Comparada con la greedy con probabilidad a posteriori, su ganancia promedio y variabilidad son levemente menores. Aun así, su intervalo es demasiado amplio en comparación a la situación ideal.
 
 
 ## Estrategia 5: Softmax
 
-En esta estrategia, para elegir la maquina a jugar primero se obtiene la probabilidad de exito observada $\pi_i$ de cada maquina y se les aplica la siguente formula:
+En esta estrategia, para elegir la máquina a jugar primero se obtiene la probabilidad de éxito observada $\pi_i$ de cada máquina y se les aplica la siguente fórmula:
 
 $$\mathrm{Pr}(i) = \frac{e^{\pi_i/\tau}}{\sum_{j=1}^3 e^{\pi_i/\tau}} $$
 
-Siendo \tau un parametro de "temperatura" que controla el grado de exploracion. Luego se elige la maquina i con probabilidad $\mathrm{Pr}(i)$.
+Siendo $\tau$ un parámetro de "temperatura" que controla el grado de exploración. Luego se elige la máquina i con probabilidad $\mathrm{Pr}(i)$. Esto significa que no es un método bayesiano porque no utiliza distribuciones de probabilidad a priori ni a posteriori.
 
-Se observa en la siguiente tabla las tasas de las probabilidades de exito reales de las maquinas para ver que les ocurre cuando \tau varia.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+Se observa en la siguiente tabla las razones de las probabilidades de éxito reales de las máquinas aplicando la fórmula para ver qué les ocurre cuando $\tau$ varía.
+
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Comparación de probabilidades usando Softmax"}
 s1 = round(c(prob[2]/prob[1],prob[2]/prob[3]),2)
 
 s3 = round(c(softmax(prob,c(1),1)[2]/softmax(prob,1,1)[1], softmax(prob,1,1)[2]/softmax(prob,1,1)[3]),2)
@@ -618,12 +752,13 @@ kable(s, col.names = c("Maquina 2 / Maquina 1", "Maquina 2 / Maquina 3")) %>%
 
 ```
 
-Cuando la temperatura crece, la diferencias entre las probabilidades de exito de cada maquina disminuyen mientras que las diferencias aumentan cuando la temperatura disminuye. Cuando la temperatura es alta, se exploran todas las maquinas, mientras que cuando es baja, se explota la que hasta el momento sea la que tenga la mayor probabilidad de exito.
+Cuando la temperatura crece, la diferencias entre las probabilidades de éxito de cada maquina disminuyen, mientras que las diferencias aumentan cuando la temperatura es menor. Cuando la temperatura es alta, se exploran todas las máquinas, mientras que cuando es baja, se explota la que hasta el momento tenga la mayor probabilidad de éxito.
 
 
-Para ver que temperatura seleccionar se grafican las ganacias promedio en 1000 años para distintos valores de la temperatura.
 
-```{r}
+Para ver la temperatura a seleccionar, se grafican las ganacias promedio en 1000 años para distintos valores.
+
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap = "Ganancia promedio para distintos valores de τ"}
 vector2 = data.frame(matrix(nrow = 50, ncol = 1))
 
 temperatura = c(seq(1/25,2,1/25))
@@ -645,22 +780,18 @@ colnames(xxx2) = c("x", "seq")
 ggplot(xxx2)+geom_line(aes(x = seq, y = x), color = "red")+
 tema+
 scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0,280))+
-  scale_x_continuous(name="Temperatura")+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(name="Temperatura")
 
 temp = xxx2$seq[which.max(xxx2$x)]
 
 ```
 
-Queremos que en promedio se gane lo mayor posible. El valor que maximiza las ganancias es `r temp`.
-
-
+Se quiere ganar en promedio lo mayor posible. El valor de $\tau$ que maximiza las ganancias es `r temp`.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Evolución diaria del uso de las máquinas y la ganancia generada"}
 set.seed(69)
-
 
 temperatura = temp
 
@@ -689,10 +820,10 @@ grid.arrange(plot1_softmax_dia, plot2_softmax_dia, ncol = 2)
 ```
 
 
-En los primeros cinco meses del año, se usa mayoritariamente la maquina 3 pero luego comienza a su vez a utilizar la maquina 2. Esto se debe a que el metodo permite la exploracion de las maquinas que no esta explotando. Al usar la maquina 2, aumenta su probabilidad de exito observada, que aumenta la probalidad de elegirla con el metodo. En el siguiente grafico se puede observar dicho efecto.
+En los primeros cinco meses del año, se usa mayoritariamente la máquina 3 pero llega un punto donde también comienza a utilizar la máquina 2. Esto se debe a que el método permite la exploración de las máquinas que no está explotando. Al usar la máquina 2, aumenta su probabilidad de éxito observada, que a su vez incrementa la probalidad de ser elegida. En el siguiente gráfico se puede observar dicho efecto.
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_softmax_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_softmax_post = cbind(datos_softmax_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -711,7 +842,7 @@ Maquinas_softmax = cbind(Maquinas_softmax, matrix(rep(c("Maquina 1", "Maquina 2"
 datos_softmax_post = cbind(datos_softmax_post, Maquinas_softmax)
 colnames(datos_softmax_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
+
 
 
 plot3_softmax_dia = ggplot(datos_softmax_post, aes(col = factor(Maquina))) +
@@ -733,19 +864,11 @@ plot3_softmax_dia = ggplot(datos_softmax_post, aes(col = factor(Maquina))) +
 
 plot3_softmax_dia
 
-
-Pb_softmax_1 = (2+datos_softmax_dia$Maquina1[366]) / (4+datos_softmax_dia$Maquina1Total[366])
-Pb_softmax_2 =(2+datos_softmax_dia$Maquina2[366]) / (4+datos_softmax_dia$Maquina2Total[366])
-Pb_softmax_3 =(2+datos_softmax_dia$Maquina3[366]) / (4+datos_softmax_dia$Maquina3Total[366])
-
-
-
-
 ```
 
-Para observar como varian las ganancias usando este metodo se simularon 1000 años, las cuales arrojaron los siguientes resultados:
+Para observar como varían las ganancias usando este método, se simularon 1000 años, los cuales arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 temperatura = temp
@@ -760,8 +883,7 @@ colnames(Exitos_softmax_totales) = "x"
 
 ggplot(Exitos_softmax_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
 
 Media_softmax = round(mean(Exitos_softmax_totales$x),2)
 
@@ -773,19 +895,19 @@ Q_softmax_int = c(mean(Q_softmax[25], Q_softmax[26]), mean(Q_softmax[975], Q_sof
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_softmax` unidades monetarias en un año. Esto es un `r 100-round(100*Media_softmax/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_softmax_int[1]` y `r Q_greedy_posterior_int[2]`. Su amplitud es de `r Q_softmax_int[2]-Q_softmax_int[1]` unidades monetarias, siendo `r round((Q_softmax_int[2]-Q_softmax_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces mas grande que el caso ideal.
+El 95% de las ganancias al final del año estuvieron entre `r Q_softmax_int[1]` y `r Q_greedy_posterior_int[2]`. Su amplitud es de `r Q_softmax_int[2]-Q_softmax_int[1]` unidades monetarias, siendo `r round((Q_softmax_int[2]-Q_softmax_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces el caso ideal.
 
 
-Su ganancia promedio es menor que todas las estrategias greedy, pero la amplitud de su intervalo es mas baja. Es decir, si una persona quisiera tener mas seguridad sobre la cantidad de unidades monetarias a ganar jugaria esta a las mencionadas. 
+Su ganancia promedio es menor que todas las estrategias greedy, pero la amplitud de su intervalo es mas baja. Es decir, si una persona quisiera tener más seguridad sobre la cantidad de unidades monetarias a ganar jugaría esta a las mencionadas. 
 
 
 ## Estrategia 6: Upper-bound
 
-Sera seleccionada la maquina que tenga el mayor extremo derecho de un intervalo de credibilidad. En este caso, el extremo derecho del intervalo usado es aquel que acumula el 97.5% de la densidad. Si los extremos derechos de los intervalos son iguales para algunas maquinas se elige una de ellas aleatoriamente.
+Se selecciona la máquina que tenga el mayor extremo derecho de un intervalo de credibilidad de la distribución a posteriori de la probabilidad de éxito. En este caso, el extremo derecho del intervalo usado es aquel que acumula el 97.5% de la densidad. Si los extremos derechos de los intervalos son iguales para algunas máquinas, se elige una de ellas aleatoriamente. Este es un método bayesiano por usar intervalos de credibilidad de las distribuciones a posteriori de las probabilidades de éxito de cada máquina.
 
 Se juega un año con esta estrategia y se obtienen los siguites resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Evolución diaria del uso de las máquinas y la ganancia generada"}
 set.seed(69)
 
 datos_upper_dia = actualizar(366, 1,"upper")
@@ -812,9 +934,9 @@ plot2_upper_dia = ggplot(datos_upper_dia)+
 grid.arrange(plot1_upper_dia, plot2_upper_dia, ncol = 2)
 ```
 
-Al comienzo del año se juegan todas las maquinas en una proporcion parecida, pero al cabo de un mes y un par de dias el metodo elige utilizar exclusivamente la maquina 2.
+Al comienzo del año se juegan todas las máquinas en una proporción parecida, pero al cabo de un mes y un par de días el método elige utilizar exclusivamente la máquina 2.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_upper_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_upper_post = cbind(datos_upper_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -833,7 +955,6 @@ Maquinas_upper = cbind(Maquinas_upper, matrix(rep(c("Maquina 1", "Maquina 2", "M
 datos_upper_post = cbind(datos_upper_post, Maquinas_upper)
 colnames(datos_upper_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
 
 plot3_upper_dia = ggplot(datos_upper_post, aes(col = factor(Maquina))) +
@@ -856,18 +977,11 @@ plot3_upper_dia = ggplot(datos_upper_post, aes(col = factor(Maquina))) +
 plot3_upper_dia
 
 
-Pb_upper_1 = (2+datos_upper_dia$Maquina1[366]) / (4+datos_upper_dia$Maquina1Total[366])
-Pb_upper_2 =(2+datos_upper_dia$Maquina2[366]) / (4+datos_upper_dia$Maquina2Total[366])
-Pb_upper_3 =(2+datos_upper_dia$Maquina3[366]) / (4+datos_upper_dia$Maquina3Total[366])
-
-
-
-
 ```
 
-Como varias de las estrategias anteriores, generalmente esta tambien luego de un cierto numero de dias procede a jugar en una sola maquina. Pero para poder observar su diferencia con las demas tecnicas se realizaron simulaciones de 1000 años, las cuales arrojaron los siguientes resultados:
+Como varias de las estrategias anteriores, luego de un cierto número de días procede a jugar con una sola máquina. Pero para poder observar su diferencia con las demás técnicas se realizaron simulaciones de 1000 años, las cuales arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 datos_upper_año = actualizar(366, 1000, "upper")
@@ -880,8 +994,7 @@ colnames(Exitos_upper_totales) = "x"
 
 ggplot(Exitos_upper_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
 
 Media_upper = round(mean(Exitos_upper_totales$x),2)
 
@@ -892,18 +1005,18 @@ Q_upper_int = c(mean(Q_upper[25], Q_upper[26]), mean(Q_upper[975], Q_upper[976])
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_upper` unidades monetarias en un año. Esto es un `r 100-round(100*Media_upper/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_upper_int[1]` y `r Q_upper_int[2]`. Su amplitud es de `r Q_upper_int[2]-Q_upper_int[1]` unidades monetarias, siendo `r round((Q_upper_int[2]-Q_upper_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces mas grande que el caso ideal.
+El 95% de las ganancias al final del año estuvieron entre `r Q_upper_int[1]` y `r Q_upper_int[2]`. Su amplitud es de `r Q_upper_int[2]-Q_upper_int[1]` unidades monetarias, siendo `r round((Q_upper_int[2]-Q_upper_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces el caso ideal.
 
 
-Se puede observar que el histograma de esta estrategia es mucho mas simetrico que el de las tecnicas anteriores que se le parecen. Esto se debe a que cada año la maquina con la que mas veces se suele quedar el metodo es la 2, es decir, la que mayor probabilidad de exito tiene.
+Se puede observar que el histograma de esta estrategia es mucho mas simétrico que el de las técnicas anteriores. Esto se debe a que cada año la máquina con la que más veces se suele quedar el método es la 2, es decir, la que mayor probabilidad de éxito tiene.
 
 ## Estrategia 7: Thompson sampling
 
-Para elegir que maquina se usa en el dia, se saca una muestra de la distribucion a porteriori de las probabilidades de éxito de cada una de ellas y se selecciona aquella con el maximo valor muestral.
+Para elegir que máquina se usa en el día, se saca una muestra de la distribución a porteriori de las probabilidades de éxito de cada una de ellas y se selecciona aquella con el mayor valor muestral. Este es un método bayesiano por usar las distribuciones a posteriori de las probabilidades de éxito de cada máquina.
 
-Se juega un año con esta estrategia y se obtienen los siguites resultados:
+Se juega un año con esta estrategia y se obtienen los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Evolución diaria del uso de las máquinas y la ganancia generada"}
 set.seed(69)
 
 
@@ -931,9 +1044,9 @@ plot2_thompson_dia = ggplot(datos_thompson_dia)+
 grid.arrange(plot1_thompson_dia, plot2_thompson_dia, ncol = 2)
 ```
 
-En este caso, en los primero 3 o 4 meses, la estrategia usa todas las maquinas. Luego de este periodo, utiliza mayormente la segunda dejando de utilizar las demas aproximadamente a mitad de año. Se parece a las demas estrategias con la diferencia de usar muchas mas veces las maquinas con las que no se termina quedando el metodo.
+En los primero 3 o 4 meses, la estrategia usa todas las máquinas. Luego de este período, utiliza mayormente la segunda dejando de utilizar las demás aproximadamente a mitad de año.
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.cap = "Distribución a posteriori de la probabilidad de éxito de las máquinas en ciertos días"}
 set.seed(69)
 datos_thompson_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_thompson_post = cbind(datos_thompson_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -952,7 +1065,6 @@ Maquinas_thompson = cbind(Maquinas_thompson, matrix(rep(c("Maquina 1", "Maquina 
 datos_thompson_post = cbind(datos_thompson_post, Maquinas_thompson)
 colnames(datos_thompson_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
 
 plot3_thompson_dia = ggplot(datos_thompson_post, aes(col = factor(Maquina))) +
@@ -974,21 +1086,13 @@ plot3_thompson_dia = ggplot(datos_thompson_post, aes(col = factor(Maquina))) +
 
 plot3_thompson_dia
 
-
-Pb_thompson_1 = (2+datos_thompson_dia$Maquina1[366]) / (4+datos_thompson_dia$Maquina1Total[366])
-Pb_thompson_2 =(2+datos_thompson_dia$Maquina2[366]) / (4+datos_thompson_dia$Maquina2Total[366])
-Pb_thompson_3 =(2+datos_thompson_dia$Maquina3[366]) / (4+datos_thompson_dia$Maquina3Total[366])
-
-
-
-
 ```
 
-Generalmente esta estragia, como la mayoria de las demas, luego de un cierto numero de dias procede a jugar con una sola maquina.
+Generalmente esta estragia, como las demás, luego de un cierto número de días procede a jugar con una sola máquina.
 
-Para observar como varian las ganancias usando este metodo se simularon 1000 años, las cuales arrojaron los siguientes resultados:
+Para observar como varían las ganancias usando este método se simularon 1000 años, los cuales arrojaron los siguientes resultados:
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE, fig.height = 2, fig.width = 4, fig.cap="Ganancias en los distintos años"}
 set.seed(69)
 
 datos_thompson_año = actualizar(366, 1000, "thompson")
@@ -1001,8 +1105,8 @@ colnames(Exitos_thompson_totales) = "x"
 
 ggplot(Exitos_thompson_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+
 
 Media_thompson = round(mean(Exitos_thompson_totales$x),2)
 
@@ -1013,72 +1117,127 @@ Q_thompson_int = c(mean(Q_thompson[25], Q_thompson[26]), mean(Q_thompson[975], Q
 
 En promedio, siguiendo esta estrategia, se espera ganar `r Media_thompson` unidades monetarias en un año. Esto es un `r 100-round(100*Media_thompson/Media_ideal,2)`% menos que el caso ideal.
 
-El 95% de las ganancias al final del año estuvieron entre `r Q_thompson_int[1]` y `r Q_thompson_int[2]`. Su amplitud es de `r Q_thompson_int[2]-Q_thompson_int[1]` unidades monetarias, siendo `r round((Q_thompson_int[2]-Q_thompson_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces mas grande que el caso ideal.
+El 95% de las ganancias al final del año estuvieron entre `r Q_thompson_int[1]` y `r Q_thompson_int[2]`. Su amplitud es de `r Q_thompson_int[2]-Q_thompson_int[1]` unidades monetarias, siendo `r round((Q_thompson_int[2]-Q_thompson_int[1]) / (Q_ideal_int[2]-Q_ideal_int[1]), 2)` veces el caso ideal.
 
 
 
-Esta estrategia, como la anterior, tiene un histograma bastante simetrico. Es mejor que los otros metodos parecidos pero es peor que upper bound ya que tiene un promedio de ganancias mas chico, aunque la amplitud de su intervalo sea ligeramente mas pequeño.
+Esta estrategia, como la anterior, tiene un histograma bastante simétrico. Es mejor que los otros métodos y aunque la amplitud de su intervalo sea ligeramente más pequeño, es peor que el upper bound, ya que tiene un promedio de ganancias más chico.
 
 
 # Conclusion
 
-En todas las estrategias usadas se vio entrelazado el concepto de explorar o explotar, dandole distintas importancias a cada una. Los mejores metodos son lo que pueden encontrar un equilibrio entre ambos enfoques. Aquel que explore lo justo y necesario para asegurarse de elegir la mejor opcion al momento de explotar. Viendo desde este enfoque los resultados, el mejor metodo entre los utilizados en el informe es el upper bound, siendo este el que mejor supo balancear ambos conceptos dando como consecuencia el mayor promedio de unidades monetarias ganadas y con casi la menor variabilidad entre todos las estrategias.
-Puede existir una mejor estrategia que capture mejor el concepto de "explorar vs explotar".
+En todas las estrategias usadas se vio entrelazado el concepto de explorar o explotar, dándole distintas importancias a cada una. Los mejores métodos son lo que pueden encontrar un equilibrio entre ambos enfoques, es decir, aquel que explore lo justo y necesario para asegurarse de elegir la mejor opción al momento de explotar. Viendo desde este enfoque los resultados, la mejor estrategia entre las utilizadas en el informe es la upper bound, siendo esta la que mejor supo balancear ambos conceptos dando como consecuencia el mayor promedio de unidades monetarias ganadas y con casi la menor variabilidad entre todos los métodos.
+Puede existir una estrategia más eficiente que capture mejor el concepto de "explorar vs explotar", por lo que se recomienda profundizar en el tema.
 
 
-
-
-
-
-
-
-Primera pagina que no tenga numero
-poner tildes
-decir si son metodos bayesianos
-anexo
 
 \newpage
 
 # Anexo
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+
+```{r, eval=FALSE}
+
+#Paquetes
 library(tidyverse)
 library(ggplot2)
 library(gridExtra)
 library(ggpubr)
 library(knitr)
 library(kableExtra)
-source("Funciones.R")
+
+#Probabilidades de exito de las maquinas
 prob=c(.3, .55, .45)
+
+#Tema de los graficos
 tema = theme(panel.grid = element_line(color = "lightgrey"),
              panel.background = element_rect(fill = "#f8f8f8"),
              axis.line = element_line(color = "black"))
+
+#Colores de los graficos de las distribuciones a posteriori
 colores=c("#ffe500", "#ffa200", "#ff8000", "#ff5500", "#ff3600", "#ff0000", "#ffc500")
 ```
 
-## Situación ideal
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+
+Funciones
+
+```{r, eval=FALSE}
+# -------------- Cual Maximo ---------------------------------------------------
+cual_maximo = function(max_vec){
+  maximo = which(max(max_vec) == max_vec)
+  if (length(maximo) == 1) {
+    return(maximo)
+  } else {return(sample(maximo, 1))}
+}
+
+#Elige la posición del maximo de un vector. Si hay empate, elige uno aleatoriamente
+
+
+#Función para generar n muestras de una persona que juegue k días especificando la estrategia que sigue  
+
+actualizar = function(dias = 366, muestras = 1, metodo = "random", temp = 1, e = .5){
+  lista = list(random = random, greedy_tasa = greedy_tasa, greedy_posterior = greedy_posterior,
+             e_greedy = e_greedy, softmax = soft, upper = upper, thompson = thompson)
+  metodo = lista[[metodo]]
+  matriz = matrix(0, dias*muestras, 10)
+  for (j in 1:muestras) {
+    y = c(0, 0, 0, 0, 0, 0, j)
+    for (i in 1:dias) {
+      x=metodo(y, temp, e)
+      y[x[2]] = y[x[2]] + x[1]
+      y[x[2]+3] = y[x[2] + 3] + 1
+      matriz[i+(dias*(j-1)),] = c(x, y, i)
+    }
+  }
+  datos = as.data.frame(matriz)
+  colnames(datos) = c("Exito", "Maquina", "Maquina1", "Maquina2", "Maquina3", "Maquina1Total",
+                      "Maquina2Total", "Maquina3Total", "Muestra", "Dia")
+  return(datos)
+}
+```
+
+
+Situación ideal
+
+
+```{r, eval=FALSE}
+
+#Generación de 1000 años
 set.seed(69)
 datos = matrix(rbinom(366000, 1, prob[2]), nrow = 1000, ncol = 366, byrow = T)
 ideal = as.data.frame(rowSums(datos))
 colnames(ideal) = "x"
 
+#Histograma de las ganancias para los años
 ggplot(ideal, aes(x))+geom_histogram(fill = "#FF8F54", color = "black",binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,175), breaks = seq(0,175,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(168,232,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(168,232,8), name = "Unidades monetarias")+ tema
 
+#Calculo de la ganancia promedio y los intervalos
 Media_ideal = mean(rowSums(datos))
 Q_ideal = sort(rowSums(datos))
 Q_ideal_int = c(mean(Q_ideal[25], Q_ideal[26]), mean(Q_ideal[975], Q_ideal[976]))
 ```
 
-## Estrategia 1: Completamente al azar
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+Estrategia 1: Completamente al azar
+
+
+```{r, eval=FALSE}
+#Generación de un dia para la estrategia
+
+random = function(y, temp, e){
+  cual = floor(runif(1,1,4))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)}
+
+
+#Generación de 1 año
 set.seed(69)
-
 datos_random_dia = actualizar(366, 1)
+
+
+#Gráfico de la elección diaria de máquina
 
 plot1_random_dia = ggplot(datos_random_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
@@ -1091,6 +1250,7 @@ plot1_random_dia = ggplot(datos_random_dia)+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
+#Gráfico de la ganancia diaria
 
 plot2_random_dia = ggplot(datos_random_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
@@ -1098,12 +1258,11 @@ plot2_random_dia = ggplot(datos_random_dia)+
   scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
-
+#Unión de los dos gráficos
 grid.arrange(plot1_random_dia, plot2_random_dia, ncol = 2)
-```
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+#Generación de las curvas de las binomiales para los días seleccionados
 set.seed(69)
 datos_random_post = matrix(seq(0, 1, .001), nrow = 3003)
 datos_random_post = cbind(datos_random_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1122,9 +1281,9 @@ Maquinas_random = cbind(Maquinas_random, matrix(rep(c("Maquina 1", "Maquina 2", 
 datos_random_post = cbind(datos_random_post, Maquinas_random)
 colnames(datos_random_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
 
+#Gráfico de las distribuciones a posteriori para cada día
 plot3_random_dia = ggplot(datos_random_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
   geom_line(aes(x = seq, y = Dia61,color = "Dia 61"))+
@@ -1145,32 +1304,24 @@ plot3_random_dia = ggplot(datos_random_post, aes(col = factor(Maquina))) +
 plot3_random_dia
 
 
-Pb_random_1 = (2+datos_random_dia$Maquina1[366]) / (4+datos_random_dia$Maquina1Total[366])
-Pb_random_2 =(2+datos_random_dia$Maquina2[366]) / (4+datos_random_dia$Maquina2Total[366])
-Pb_random_3 =(2+datos_random_dia$Maquina3[366]) / (4+datos_random_dia$Maquina3Total[366])
-
-
-
-
-```
-
-
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+#Generación de 1000 años
 set.seed(69)
-
 datos_random_año = actualizar(366, 1000)
 
+#Obtención de la ganancia total al final de cada año
 datos_random_filter = filter(datos_random_año, Dia == 366)
-
 Exitos_random_totales = as.data.frame(rowSums(datos_random_filter[, 3:5]))
 colnames(Exitos_random_totales) = "x"
 
+
+#Histograma de las ganancias promedio para los años
 ggplot(Exitos_random_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), breaks = seq(0,175,25), limits = c(0,175), name = "Frecuencia absoluta") +
   scale_x_continuous(breaks = seq(128,192,8), name = "Unidades monetarias")+ tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+
+#Cálculo de la ganancia promedio y los intervalos
 Media_random = round(mean(Exitos_random_totales$x),2)
 
 Q_random = sort(Exitos_random_totales$x)
@@ -1178,12 +1329,40 @@ Q_random = sort(Exitos_random_totales$x)
 Q_random_int = c(mean(Q_random[25], Q_random[26]), mean(Q_random[975], Q_random[976]))
 ```
 
-## Estrategia 2: Greedy con tasa observada
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+
+Estrategia 2: Greedy con tasa observada
+
+
+```{r, eval=FALSE}
+
+#Generación de un dia para la estrategia
+greedy_tasa = function(y, temp, e){
+  if (y[1] == 0) {
+    vector = c(rbinom(1, 1, prob[1]), 1)
+    return(vector)
+  }
+  if (y[2] == 0) {
+    vector = c(rbinom(1, 1, prob[2]), 2)
+    return(vector)
+  }
+  if (y[3] == 0) {
+    vector = c(rbinom(1, 1, prob[3]), 3)
+    return(vector)
+  }   
+  cual = cual_maximo(c(y[1:3]) / c(y[4:6]))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+#Generación de 1 año
+
 set.seed(69)
 
 datos_greedy_tasa_dia = actualizar(366, 1,"greedy_tasa")
+
+
+#Gráfico de la elección diaria de máquina
 
 plot1_greedy_tasa_dia = ggplot(datos_greedy_tasa_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
@@ -1196,6 +1375,7 @@ plot1_greedy_tasa_dia = ggplot(datos_greedy_tasa_dia)+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
+#Gráfico de la ganancia diaria
 
 plot2_greedy_tasa_dia = ggplot(datos_greedy_tasa_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
@@ -1203,12 +1383,14 @@ plot2_greedy_tasa_dia = ggplot(datos_greedy_tasa_dia)+
   scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+#Unión de los dos gráficos
 
 grid.arrange(plot1_greedy_tasa_dia, plot2_greedy_tasa_dia, ncol = 2)
-```
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+
+#Generación de las curvas de las binomiales para los días seleccionados
+
 set.seed(69)
 datos_greedy_tasa_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_greedy_tasa_post = cbind(datos_greedy_tasa_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1227,8 +1409,7 @@ Maquinas_greedy_tasa = cbind(Maquinas_greedy_tasa, matrix(rep(c("Maquina 1", "Ma
 datos_greedy_tasa_post = cbind(datos_greedy_tasa_post, Maquinas_greedy_tasa)
 colnames(datos_greedy_tasa_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
-
+#Gráfico de las distribuciones a posteriori para cada día
 
 plot3_greedy_tasa_dia = ggplot(datos_greedy_tasa_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
@@ -1250,30 +1431,29 @@ plot3_greedy_tasa_dia = ggplot(datos_greedy_tasa_post, aes(col = factor(Maquina)
 plot3_greedy_tasa_dia
 
 
-Pb_greedy_tasa_1 = (2+datos_greedy_tasa_dia$Maquina1[366]) / (4+datos_greedy_tasa_dia$Maquina1Total[366])
-Pb_greedy_tasa_2 =(2+datos_greedy_tasa_dia$Maquina2[366]) / (4+datos_greedy_tasa_dia$Maquina2Total[366])
-Pb_greedy_tasa_3 =(2+datos_greedy_tasa_dia$Maquina3[366]) / (4+datos_greedy_tasa_dia$Maquina3Total[366])
+#Generación de 1000 años
 
-
-
-
-```
-
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
 datos_greedy_tasa_año = actualizar(366, 1000, "greedy_tasa")
+
+
+#Obtención de la ganancia total al final de cada año
 
 datos_greedy_tasa_filter = filter(datos_greedy_tasa_año, Dia == 366)
 
 Exitos_greedy_tasa_totales = as.data.frame(rowSums(datos_greedy_tasa_filter[, 3:5]))
 colnames(Exitos_greedy_tasa_totales) = "x"
+ 
+
+#Histograma de las ganancias promedio para los años
 
 ggplot(Exitos_greedy_tasa_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), limits = c(0,125), breaks = seq(0,125,25), name = "Frecuencia absoluta") +
-  scale_x_continuous(breaks = seq(96,232,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(96,232,8), name = "Unidades monetarias")+ tema
+
+
+#Cálculo de la ganancia promedio y los intervalos
 
 Media_greedy_tasa = round(mean(Exitos_greedy_tasa_totales$x),2)
 
@@ -1283,12 +1463,28 @@ Q_greedy_tasa_int = c(mean(Q_greedy_tasa[25], Q_greedy_tasa[26]), mean(Q_greedy_
 ```
 
 
-## Estrategia 3: Greedy con probabilidad a posteriori
+Estrategia 3: Greedy con probabilidad a posteriori
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+
+```{r, eval=FALSE}
+#Generación de un dia para la estrategia
+
+greedy_posterior = function(y, temp, e){
+  maquina1 = (2 + y[1]) / (4 + y[4])
+  maquina2 = (2 + y[2]) / (4 + y[5])
+  maquina3 = (2 + y[3]) / (4 + y[6])
+  cual = cual_maximo(c(maquina1, maquina2, maquina3)) 
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+#Generación de 1 año
+
 set.seed(69)
-
 datos_greedy_posterior_dia = actualizar(366, 1,"greedy_posterior")
+
+
+#Gráfico de la elección diaria de máquina
 
 plot1_greedy_posterior_dia = ggplot(datos_greedy_posterior_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
@@ -1302,6 +1498,8 @@ plot1_greedy_posterior_dia = ggplot(datos_greedy_posterior_dia)+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
 
+#Gráfico de la ganancia diaria
+
 plot2_greedy_posterior_dia = ggplot(datos_greedy_posterior_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
   scale_y_continuous(name="Unidades monetarias ganadas", breaks = c(seq(0, 240, 30)), limits = c(0, 240))+
@@ -1309,10 +1507,13 @@ plot2_greedy_posterior_dia = ggplot(datos_greedy_posterior_dia)+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 
-grid.arrange(plot1_greedy_posterior_dia, plot2_greedy_posterior_dia, ncol = 2)
-```
+#Unión de los dos gráficos
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+grid.arrange(plot1_greedy_posterior_dia, plot2_greedy_posterior_dia, ncol = 2)
+
+
+#Generación de las curvas de las binomiales para los días seleccionados
+
 set.seed(69)
 datos_greedy_posterior_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_greedy_posterior_post = cbind(datos_greedy_posterior_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1331,8 +1532,7 @@ Maquinas_greedy_posterior = cbind(Maquinas_greedy_posterior, matrix(rep(c("Maqui
 datos_greedy_posterior_post = cbind(datos_greedy_posterior_post, Maquinas_greedy_posterior)
 colnames(datos_greedy_posterior_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
-
+#Gráfico de las distribuciones a posteriori para cada día
 
 plot3_greedy_posterior_dia = ggplot(datos_greedy_posterior_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
@@ -1353,30 +1553,27 @@ plot3_greedy_posterior_dia = ggplot(datos_greedy_posterior_post, aes(col = facto
 
 plot3_greedy_posterior_dia
 
+#Generación de 1000 años
 
-Pb_greedy_posterior_1 = (2+datos_greedy_posterior_dia$Maquina1[366]) / (4+datos_greedy_posterior_dia$Maquina1Total[366])
-Pb_greedy_posterior_2 =(2+datos_greedy_posterior_dia$Maquina2[366]) / (4+datos_greedy_posterior_dia$Maquina2Total[366])
-Pb_greedy_posterior_3 =(2+datos_greedy_posterior_dia$Maquina3[366]) / (4+datos_greedy_posterior_dia$Maquina3Total[366])
-
-
-
-
-```
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
 datos_greedy_posterior_año = actualizar(366, 1000, "greedy_posterior")
+
+#Obtención de la ganancia total al final de cada año
 
 datos_greedy_posterior_filter = filter(datos_greedy_posterior_año, Dia == 366)
 
 Exitos_greedy_posterior_totales = as.data.frame(rowSums(datos_greedy_posterior_filter[, 3:5]))
 colnames(Exitos_greedy_posterior_totales) = "x"
 
+#Histograma de las ganancias promedio para los años
+
 ggplot(Exitos_greedy_posterior_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 125)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+
+
+#Cálculo de la ganancia promedio y los intervalos
 
 Media_greedy_posterior = round(mean(Exitos_greedy_posterior_totales$x),2)
 
@@ -1387,11 +1584,23 @@ Q_greedy_posterior_int = c(mean(Q_greedy_posterior[25], Q_greedy_posterior[26]),
 
 ```
 
-## Estrategia 4: $\epsilon$-greedy (con tasa observada)
+
+Estrategia 4: $\epsilon$-greedy (con tasa observada)
+
+```{r, eval=FALSE}
+#Generación de un dia para la estrategia
+
+e_greedy = function(y, temp, e){
+  which = rbinom(1, 1, e)
+  if (which == 0) {
+    return(greedy_tasa(y, temp ,e))
+  } else {
+    return(random(y, temp, e))
+    }
+}
 
 
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+# Generación de los 1000 años para cada valor de epsilon
 vector = data.frame(matrix(nrow = 101, ncol = 1))
 
 for (i in 0:100) {
@@ -1401,12 +1610,12 @@ for (i in 0:100) {
 
 }
 
-
-
 xxx = as.matrix(vector/1000)
 xxx = as.data.frame(cbind(xxx, seq(0, .99, .01)))
 colnames(xxx) = c("x", "seq")
 
+
+#Gráfico de las ganancias promedio para cada valor de epsilon
 
 ggplot(xxx)+geom_line(aes(x = seq, y = x), color = "red")+
 tema+
@@ -1415,18 +1624,20 @@ scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.85,.85), legend.background = element_blank(), legend.key = element_blank())
 
+#Valor de epsilon
 e = xxx$seq[which.max(xxx$x)]
-```
 
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+#Generación de 1 año
+
 set.seed(69)
 
 epsilon = e
 
 datos_e_greedy_dia = actualizar(366, 1,"e_greedy", e = epsilon)
 
+#Gráfico de la elección diaria de máquina
 plot1_e_greedy_dia = ggplot(datos_e_greedy_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
   geom_line(aes(x = Dia, y = Maquina2Total, colour = "Maquina 2"))+
@@ -1439,18 +1650,21 @@ plot1_e_greedy_dia = ggplot(datos_e_greedy_dia)+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
 
+#Gráfico de la ganancia diaria
+
 plot2_e_greedy_dia = ggplot(datos_e_greedy_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
   scale_y_continuous(name="Unidades monetarias ganadas", breaks = c(seq(0, 240, 30)), limits = c(0, 240))+
   scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+#Unión de los dos gráficos
 
 grid.arrange(plot1_e_greedy_dia, plot2_e_greedy_dia, ncol = 2)
-```
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+#Generación de las curvas de las binomiales para los días seleccionados
+
 set.seed(69)
 datos_e_greedy_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_e_greedy_post = cbind(datos_e_greedy_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1469,8 +1683,8 @@ Maquinas_e_greedy = cbind(Maquinas_e_greedy, matrix(rep(c("Maquina 1", "Maquina 
 datos_e_greedy_post = cbind(datos_e_greedy_post, Maquinas_e_greedy)
 colnames(datos_e_greedy_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
+#Gráfico de las distribuciones a posteriori para cada día
 
 plot3_e_greedy_dia = ggplot(datos_e_greedy_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
@@ -1491,23 +1705,14 @@ plot3_e_greedy_dia = ggplot(datos_e_greedy_post, aes(col = factor(Maquina))) +
 
 plot3_e_greedy_dia
 
+#Generación de 1000 años
 
-Pb_e_greedy_1 = (2+datos_e_greedy_dia$Maquina1[366]) / (4+datos_e_greedy_dia$Maquina1Total[366])
-Pb_e_greedy_2 =(2+datos_e_greedy_dia$Maquina2[366]) / (4+datos_e_greedy_dia$Maquina2Total[366])
-Pb_e_greedy_3 =(2+datos_e_greedy_dia$Maquina3[366]) / (4+datos_e_greedy_dia$Maquina3Total[366])
-
-
-
-
-```
-
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
-epsilon = e
-
 datos_e_greedy_año = actualizar(366, 1000, "e_greedy", e = epsilon)
+
+
+#Obtención de la ganancia total al final de cada año
 
 datos_e_greedy_filter = filter(datos_e_greedy_año, Dia == 366)
 
@@ -1515,21 +1720,56 @@ Exitos_e_greedy_totales = as.data.frame(rowSums(datos_e_greedy_filter[, 3:5]))
 colnames(Exitos_e_greedy_totales) = "x"
 
 
+
+#Histograma de las ganancias promedio para los años
+
 ggplot(Exitos_e_greedy_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 150), breaks = seq(0, 150, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+  
+#Cálculo de la ganancia promedio y los intervalos
 
 Media_e_greedy = round(mean(Exitos_e_greedy_totales$x),2)
 
 Q_e_greedy = sort(Exitos_e_greedy_totales$x)
 
 Q_e_greedy_int = c(mean(Q_e_greedy[25], Q_e_greedy[26]), mean(Q_e_greedy[975], Q_e_greedy[976]))
+
 ```
 
-## Estrategia 5: Softmax
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+Estrategia 5: Softmax
+
+```{r, eval=FALSE}
+#Generación de un dia para la estrategia
+
+softmax = function(tasas, temp, e){
+  p = exp(tasas / temp) / sum(exp(tasas / temp))
+  for (k in 1:length(p)) {
+    if (is.na(p[k])) {
+      p[k] = 0
+    }
+  }
+  return(p)}
+
+soft = function(y, temp, e){
+  tasa = y[1:3] / y[4:6]
+  for (k in 1:length(tasa)) {
+    if (is.na(tasa[k])) {
+      tasa[k] = 0
+    }
+  }
+  p = softmax(tasa, temp)
+  if (sum(p) == 0) {
+    p = rep(1/3,3)
+  }
+  cual = sample(c(1, 2, 3), size = 1, prob = p)
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+#Generación de la tabla
+
 s1 = round(c(prob[2]/prob[1],prob[2]/prob[3]),2)
 
 s3 = round(c(softmax(prob,c(1),1)[2]/softmax(prob,1,1)[1], softmax(prob,1,1)[2]/softmax(prob,1,1)[3]),2)
@@ -1544,9 +1784,7 @@ rownames(s) = c("Originales", "Temperatura = 1/25", "Temperatura = 1", "Temperat
 kable(s, col.names = c("Maquina 2 / Maquina 1", "Maquina 2 / Maquina 3")) %>% 
   kable_material(c("striped", "hover"))
 
-```
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+# Generación de los 1000 años para cada valor de la temperatura
 vector2 = data.frame(matrix(nrow = 50, ncol = 1))
 
 temperatura = c(seq(1/25,2,1/25))
@@ -1558,12 +1796,11 @@ for (i in 1:50) {
 }
 
 
-
-
 xxx2 = as.matrix(vector2/1000)
 xxx2 = as.data.frame(cbind(xxx2, temperatura))
 colnames(xxx2) = c("x", "seq")
 
+#Gráfico de las ganancias promedio para cada valor de temperatura 
 
 ggplot(xxx2)+geom_line(aes(x = seq, y = x), color = "red")+
 tema+
@@ -1571,18 +1808,21 @@ scale_y_continuous(name="Ganancias promedio",breaks = seq(0,280,40),limits = c(0
   scale_x_continuous(name="Temperatura")+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+
+#Valor de la temperatura
 temp = xxx2$seq[which.max(xxx2$x)]
 
-```
 
+#Generación de 1 año
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
-
 
 temperatura = temp
 
 datos_softmax_dia = actualizar(366, 1,"softmax", temp = temperatura)
+
+
+#Gráfico de la elección diaria de máquina
 
 plot1_softmax_dia = ggplot(datos_softmax_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
@@ -1596,19 +1836,21 @@ plot1_softmax_dia = ggplot(datos_softmax_dia)+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
 
+#Gráfico de la ganancia diaria
+
 plot2_softmax_dia = ggplot(datos_softmax_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
   scale_y_continuous(name="Unidades monetarias ganadas", breaks = c(seq(0, 240, 30)), limits = c(0, 240))+
   scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+#Unión de los dos gráficos
 
 grid.arrange(plot1_softmax_dia, plot2_softmax_dia, ncol = 2)
-```
 
 
+#Generación de las curvas de las binomiales para los días seleccionados
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 datos_softmax_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_softmax_post = cbind(datos_softmax_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1627,8 +1869,8 @@ Maquinas_softmax = cbind(Maquinas_softmax, matrix(rep(c("Maquina 1", "Maquina 2"
 datos_softmax_post = cbind(datos_softmax_post, Maquinas_softmax)
 colnames(datos_softmax_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
+#Gráfico de las distribuciones a posteriori para cada día
 
 plot3_softmax_dia = ggplot(datos_softmax_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
@@ -1650,50 +1892,64 @@ plot3_softmax_dia = ggplot(datos_softmax_post, aes(col = factor(Maquina))) +
 plot3_softmax_dia
 
 
-Pb_softmax_1 = (2+datos_softmax_dia$Maquina1[366]) / (4+datos_softmax_dia$Maquina1Total[366])
-Pb_softmax_2 =(2+datos_softmax_dia$Maquina2[366]) / (4+datos_softmax_dia$Maquina2Total[366])
-Pb_softmax_3 =(2+datos_softmax_dia$Maquina3[366]) / (4+datos_softmax_dia$Maquina3Total[366])
+#Generación de 1000 años
 
-
-
-
-```
-
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
 temperatura = temp
 
 datos_softmax_año = actualizar(366, 1000, "softmax", temp = temperatura)
 
+#Obtención de la ganancia total al final de cada año
+
 datos_softmax_filter = filter(datos_softmax_año, Dia == 366)
 
 Exitos_softmax_totales = as.data.frame(rowSums(datos_softmax_filter[, 3:5]))
 colnames(Exitos_softmax_totales) = "x"
 
+#Histograma de las ganancias promedio para los años
 
 ggplot(Exitos_softmax_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+
+#Cálculo de la ganancia promedio y los intervalos
 
 Media_softmax = round(mean(Exitos_softmax_totales$x),2)
 
 Q_softmax = sort(Exitos_softmax_totales$x)
 
 Q_softmax_int = c(mean(Q_softmax[25], Q_softmax[26]), mean(Q_softmax[975], Q_softmax[976]))
+
 ```
 
 
 
-## Estrategia 6: Upper-bound
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+
+
+Estrategia 6: Upper-bound
+
+```{r, eval=FALSE}
+#Generación de un dia para la estrategia
+
+upper = function(y, temp, e){
+  maquina1 = qbeta(.975, 2 + y[1], 2 + y[4] - y[1])
+  maquina2 = qbeta(.975, 2 + y[2], 2 + y[5] - y[2])
+  maquina3 = qbeta(.975, 2 + y[3], 2 + y[6] - y[3])
+  cual = cual_maximo(c(maquina1, maquina2, maquina3))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+#Generación de 1 año
+
 set.seed(69)
 
 datos_upper_dia = actualizar(366, 1,"upper")
+
+#Gráfico de la elección diaria de máquina
 
 plot1_upper_dia = ggplot(datos_upper_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
@@ -1706,6 +1962,7 @@ plot1_upper_dia = ggplot(datos_upper_dia)+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
+#Gráfico de la ganancia diaria
 
 plot2_upper_dia = ggplot(datos_upper_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
@@ -1713,12 +1970,12 @@ plot2_upper_dia = ggplot(datos_upper_dia)+
   scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+#Unión de los dos gráficos
 
 grid.arrange(plot1_upper_dia, plot2_upper_dia, ncol = 2)
-```
 
+#Generación de las curvas de las binomiales para los días seleccionados
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 datos_upper_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_upper_post = cbind(datos_upper_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1737,8 +1994,8 @@ Maquinas_upper = cbind(Maquinas_upper, matrix(rep(c("Maquina 1", "Maquina 2", "M
 datos_upper_post = cbind(datos_upper_post, Maquinas_upper)
 colnames(datos_upper_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
 
+#Gráfico de las distribuciones a posteriori para cada día
 
 plot3_upper_dia = ggplot(datos_upper_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
@@ -1759,49 +2016,59 @@ plot3_upper_dia = ggplot(datos_upper_post, aes(col = factor(Maquina))) +
 
 plot3_upper_dia
 
-
-Pb_upper_1 = (2+datos_upper_dia$Maquina1[366]) / (4+datos_upper_dia$Maquina1Total[366])
-Pb_upper_2 =(2+datos_upper_dia$Maquina2[366]) / (4+datos_upper_dia$Maquina2Total[366])
-Pb_upper_3 =(2+datos_upper_dia$Maquina3[366]) / (4+datos_upper_dia$Maquina3Total[366])
-
-
-
-
-```
-
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+#Generación de 1000 años
 set.seed(69)
 
 datos_upper_año = actualizar(366, 1000, "upper")
+
+#Obtención de la ganancia total al final de cada año
 
 datos_upper_filter = filter(datos_upper_año, Dia == 366)
 
 Exitos_upper_totales = as.data.frame(rowSums(datos_upper_filter[, 3:5]))
 colnames(Exitos_upper_totales) = "x"
 
+#Histograma de las ganancias promedio para los años
 
 ggplot(Exitos_upper_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+
+
+#Cálculo de la ganancia promedio y los intervalos
 
 Media_upper = round(mean(Exitos_upper_totales$x),2)
 
 Q_upper = sort(Exitos_upper_totales$x)
 
 Q_upper_int = c(mean(Q_upper[25], Q_upper[26]), mean(Q_upper[975], Q_upper[976]))
+
 ```
 
 
-## Estrategia 7: Thompson sampling
+
+Estrategia 7: Thompson sampling
 
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+```{r, eval=FALSE}
+#Generación de un dia para la estrategia
+
+thompson = function(y, temp, e){
+  maquina1 = rbeta(1, 2 + y[1], 2 + y[4] - y[1])
+  maquina2 = rbeta(1, 2 + y[2], 2 + y[5] - y[2])
+  maquina3 = rbeta(1, 2 + y[3], 2 + y[6] - y[3])
+  cual = cual_maximo(c(maquina1, maquina2, maquina3))
+  vector = c(rbinom(1, 1, prob[cual]), cual)
+  return(vector)
+}
+
+#Generación de 1 año
+
 set.seed(69)
 
-
 datos_thompson_dia = actualizar(366, 1,"thompson")
+
+#Gráfico de la elección diaria de máquina
 
 plot1_thompson_dia = ggplot(datos_thompson_dia)+
   geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
@@ -1814,6 +2081,7 @@ plot1_thompson_dia = ggplot(datos_thompson_dia)+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
   theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
 
+#Gráfico de la ganancia diaria
 
 plot2_thompson_dia = ggplot(datos_thompson_dia)+
   geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
@@ -1821,11 +2089,12 @@ plot2_thompson_dia = ggplot(datos_thompson_dia)+
   scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
+#Unión de los dos gráficos
 
 grid.arrange(plot1_thompson_dia, plot2_thompson_dia, ncol = 2)
-```
 
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
+#Generación de las curvas de las binomiales para los días seleccionados
+
 set.seed(69)
 datos_thompson_post = matrix(seq(0,1,.001), nrow = 3003)
 datos_thompson_post = cbind(datos_thompson_post, dbeta(seq(0, 1, .001), 2, 2))
@@ -1844,8 +2113,7 @@ Maquinas_thompson = cbind(Maquinas_thompson, matrix(rep(c("Maquina 1", "Maquina 
 datos_thompson_post = cbind(datos_thompson_post, Maquinas_thompson)
 colnames(datos_thompson_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
 
-#prueba
-
+#Gráfico de las distribuciones a posteriori para cada día
 
 plot3_thompson_dia = ggplot(datos_thompson_post, aes(col = factor(Maquina))) +
   geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
@@ -1866,31 +2134,26 @@ plot3_thompson_dia = ggplot(datos_thompson_post, aes(col = factor(Maquina))) +
 
 plot3_thompson_dia
 
+#Generación de 1000 años
 
-Pb_thompson_1 = (2+datos_thompson_dia$Maquina1[366]) / (4+datos_thompson_dia$Maquina1Total[366])
-Pb_thompson_2 =(2+datos_thompson_dia$Maquina2[366]) / (4+datos_thompson_dia$Maquina2Total[366])
-Pb_thompson_3 =(2+datos_thompson_dia$Maquina3[366]) / (4+datos_thompson_dia$Maquina3Total[366])
-
-
-
-
-```
-
-```{r, message = FALSE, echo = FALSE, error = FALSE, warning = FALSE}
 set.seed(69)
 
 datos_thompson_año = actualizar(366, 1000, "thompson")
+
+#Obtención de la ganancia total al final de cada año
 
 datos_thompson_filter = filter(datos_thompson_año, Dia == 366)
 
 Exitos_thompson_totales = as.data.frame(rowSums(datos_thompson_filter[, 3:5]))
 colnames(Exitos_thompson_totales) = "x"
 
+#Histograma de las ganancias promedio para los años
 
 ggplot(Exitos_thompson_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
   scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
+  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+
+#Cálculo de la ganancia promedio y los intervalos
 
 Media_thompson = round(mean(Exitos_thompson_totales$x),2)
 
@@ -1898,4 +2161,6 @@ Q_thompson = sort(Exitos_thompson_totales$x)
 
 Q_thompson_int = c(mean(Q_thompson[25], Q_thompson[26]), mean(Q_thompson[975], Q_thompson[976]))
 ```
+
+
 
