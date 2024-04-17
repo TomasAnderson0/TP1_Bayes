@@ -2094,7 +2094,7 @@ Q_softmax_int = c(mean(Q_softmax[25], Q_softmax[26]), mean(Q_softmax[975], Q_sof
 Estrategia 6: Upper-bound
 
 ```{r, eval=FALSE}
-#Generación de un dia para la estrategia
+# Generación de un dia para la estrategia
 
 upper = function(y, temp, e){
   maquina1 = qbeta(.975, 2 + y[1], 2 + y[4] - y[1])
@@ -2105,105 +2105,172 @@ upper = function(y, temp, e){
   return(vector)
 }
 
-#Generación de 1 año
+# Generación de 1 año
 
 set.seed(69)
 
 datos_upper_dia = actualizar(366, 1,"upper")
 
-#Gráfico de la elección diaria de máquina
+# Gráfico de la elección diaria de máquina
 
-plot1_upper_dia = ggplot(datos_upper_dia)+
-  geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
-  geom_line(aes(x = Dia, y = Maquina2Total, colour = "Maquina 2"))+
-  geom_line(aes(x = Dia, y = Maquina3Total, colour = "Maquina 3"))+
-  tema+
-  scale_y_continuous(name = "Cantidad de veces jugadas", breaks = c(seq(0, 320, 40), 366), limits = c(0, 366))+
-  scale_x_continuous(name="Dias",breaks = seq(0, 366, 61)) +
-  scale_color_discrete(breaks=c("Maquina 1", "Maquina 2", "Maquina 3"),type = c("purple", "green","blue"), name = "")+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
-  theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
+plot1_upper_dia = ggplot(datos_upper_dia) +
+  geom_line(aes(x = Dia, y = Maquina1Total,
+                colour = "Maquina 1")) +
+  geom_line(aes(x = Dia, y = Maquina2Total,
+                colour = "Maquina 2")) +
+  geom_line(aes(x = Dia, y = Maquina3Total,
+                colour = "Maquina 3")) +
+  tema +
+  scale_y_continuous(name = "Cantidad de veces jugadas",
+                     breaks = c(seq(0, 320, 40), 366),
+                     limits = c(0, 366)) +
+  scale_x_continuous(name="Dias",
+                     breaks = seq(0, 366, 61)) +
+  scale_color_discrete(breaks=c("Maquina 1",
+                                "Maquina 2",
+                                "Maquina 3"),
+                       type = c("purple", "green","blue"),
+                       name = "") +
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm")) +
+  theme(legend.position = c(.25,.85),
+        legend.background = element_blank(),
+        legend.key = element_blank())
 
-#Gráfico de la ganancia diaria
+# Gráfico de la ganancia diaria
 
-plot2_upper_dia = ggplot(datos_upper_dia)+
-  geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
-  scale_y_continuous(name="Unidades monetarias ganadas", breaks = c(seq(0, 240, 30)), limits = c(0, 240))+
-  scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
+plot2_upper_dia = ggplot(datos_upper_dia) +
+  geom_line(aes(x = Dia,
+                y = Maquina1 + Maquina2 + Maquina3),
+            color = "red") +
+  scale_y_continuous(name="Unidades monetarias ganadas",
+                     breaks = c(seq(0, 240, 30)),
+                     limits = c(0, 240)) +
+  scale_x_continuous(name="Dias", breaks = seq(0, 366, 61)) + 
+  tema +
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
-#Unión de los dos gráficos
+# Unión de los dos gráficos
 
 grid.arrange(plot1_upper_dia, plot2_upper_dia, ncol = 2)
 
-#Generación de las curvas de las binomiales para los días seleccionados
+# Generación de las curvas de las binomiales para los días seleccionados
 
 set.seed(69)
 datos_upper_post = matrix(seq(0,1,.001), nrow = 3003)
-datos_upper_post = cbind(datos_upper_post, dbeta(seq(0, 1, .001), 2, 2))
+datos_upper_post = cbind(datos_upper_post,
+                         dbeta(seq(0, 1, .001), 2, 2))
 Maquina1_upper = matrix(nrow = 1001, ncol = 6)
 Maquina2_upper = matrix(nrow = 1001, ncol = 6)
 Maquina3_upper = matrix(nrow = 1001, ncol = 6)
 
 for (i in 1:6) {
-  Maquina1_upper[,i] = matrix(dbeta(seq(0, 1, .001), 2 + datos_upper_dia$Maquina1[61*i], 2-datos_upper_dia$Maquina1[61*i]+datos_upper_dia$Maquina1Total[61*i]))
-  Maquina2_upper[,i] = matrix(dbeta(seq(0, 1, .001), 2 + datos_upper_dia$Maquina2[61*i], 2-datos_upper_dia$Maquina2[61*i]+datos_upper_dia$Maquina2Total[61*i]))
-  Maquina3_upper[,i] = matrix(dbeta(seq(0,1,.001), 2+datos_upper_dia$Maquina3[61*i], 2-datos_upper_dia$Maquina3[61*i]+datos_upper_dia$Maquina3Total[61*i]))
-  
+  Maquina1_upper[,i] = matrix(
+    dbeta(seq(0, 1, .001),
+          2 + datos_upper_dia$Maquina1[61*i],
+          2 - datos_upper_dia$Maquina1[61*i] +
+            datos_upper_dia$Maquina1Total[61*i])
+    )
+  Maquina2_upper[,i] = matrix(
+    dbeta(seq(0, 1, .001),
+          2 + datos_upper_dia$Maquina2[61*i],
+          2 - datos_upper_dia$Maquina2[61*i] + 
+            datos_upper_dia$Maquina2Total[61*i])
+    )
+  Maquina3_upper[,i] = matrix(
+    dbeta(seq(0,1,.001), 
+          2 + datos_upper_dia$Maquina3[61*i],
+          2 - datos_upper_dia$Maquina3[61*i] + 
+            datos_upper_dia$Maquina3Total[61*i])
+    )
 }
-Maquinas_upper = as.data.frame(rbind(Maquina1_upper, Maquina2_upper, Maquina3_upper))
-Maquinas_upper = cbind(Maquinas_upper, matrix(rep(c("Maquina 1", "Maquina 2", "Maquina 3"), each = 1001), nrow = 3003,ncol = 1))
+Maquinas_upper = as.data.frame(rbind(Maquina1_upper,
+                                     Maquina2_upper,
+                                     Maquina3_upper))
+Maquinas_upper = cbind(Maquinas_upper,
+                       matrix(rep(c("Maquina 1", "Maquina 2",
+                                    "Maquina 3"),
+                                  each = 1001),
+                              nrow = 3003,
+                              ncol = 1))
 datos_upper_post = cbind(datos_upper_post, Maquinas_upper)
-colnames(datos_upper_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
+colnames(datos_upper_post) = c("seq","Dia0", "Dia61",
+                               "Dia122", "Dia183",
+                               "Dia244", "Dia305",
+                               "Dia366","Maquina")
 
 
-#Gráfico de las distribuciones a posteriori para cada día
+# Gráfico de las distribuciones a posteriori para cada día
 
-plot3_upper_dia = ggplot(datos_upper_post, aes(col = factor(Maquina))) +
-  geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
-  geom_line(aes(x = seq, y = Dia61,color = "Dia 61"))+
-  geom_line(aes(x = seq, y = Dia122,color = "Dia 122"))+
-  geom_line(aes(x = seq, y = Dia183,color = "Dia 183"))+
-  geom_line(aes(x = seq, y = Dia244,color = "Dia 244"))+
-  geom_line(aes(x = seq, y = Dia305,color = "Dia 305"))+
-  geom_line(aes(x = seq, y = Dia366, color ="Dia 366"))+
-  facet_grid(~ Maquina)+
-  tema+
-  scale_y_continuous(name = "Densidad")+
-  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank())+
-  scale_x_continuous(name = "Probabilidad de éxito", breaks = seq(0,1,.25)) +
-  scale_color_discrete(breaks=c("Dia 0", "Dia 244", "Dia 61", "Dia 305", "Dia 122", "Dia 366", "Dia 183"), type = colores, name = "")+
-  theme(legend.background = element_blank(), legend.key.height = unit(.1, "cm"), plot.margin = margin(1,.01,1,.01, "cm"), legend.position = "top")+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 6))
+plot3_upper_dia = ggplot(datos_upper_post,
+                         aes(col = factor(Maquina))) +
+  geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0")) +
+  geom_line(aes(x = seq, y = Dia61,color = "Dia 61")) +
+  geom_line(aes(x = seq, y = Dia122,color = "Dia 122")) +
+  geom_line(aes(x = seq, y = Dia183,color = "Dia 183")) +
+  geom_line(aes(x = seq, y = Dia244,color = "Dia 244")) +
+  geom_line(aes(x = seq, y = Dia305,color = "Dia 305")) +
+  geom_line(aes(x = seq, y = Dia366, color ="Dia 366")) +
+  facet_grid(~ Maquina) +
+  tema +
+  scale_y_continuous(name = "Densidad") +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) +
+  scale_x_continuous(name = "Probabilidad de éxito",
+                     breaks = seq(0,1,.25)) +
+  scale_color_discrete(breaks=c("Dia 0", "Dia 244",
+                                "Dia 61", "Dia 305",
+                                "Dia 122", "Dia 366",
+                                "Dia 183"),
+                       type = colores, name = "") +
+  theme(legend.background = element_blank(),
+        legend.key.height = unit(.1, "cm"),
+        plot.margin = margin(1,.01,1,.01, "cm"),
+        legend.position = "top") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 6))
 
 plot3_upper_dia
 
-#Generación de 1000 años
+# Generación de 1000 años
 set.seed(69)
 
 datos_upper_año = actualizar(366, 1000, "upper")
 
-#Obtención de la ganancia total al final de cada año
+# Obtención de la ganancia total al final de cada año
 
 datos_upper_filter = filter(datos_upper_año, Dia == 366)
 
-Exitos_upper_totales = as.data.frame(rowSums(datos_upper_filter[, 3:5]))
+Exitos_upper_totales = as.data.frame(
+  rowSums(datos_upper_filter[, 3:5])
+  )
 colnames(Exitos_upper_totales) = "x"
 
-#Histograma de las ganancias promedio para los años
+# Histograma de las ganancias promedio para los años
 
-ggplot(Exitos_upper_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
-  scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+ggplot(Exitos_upper_totales, aes(x)) + 
+  geom_histogram(fill = "#FF8F54",
+                 color = "black",
+                 binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)),
+                     name = "Frecuencia absoluta",
+                     limits = c(0, 175),
+                     breaks = seq(0, 175, 25)) +
+  scale_x_continuous(breaks = seq(108,220,8),
+                     name = "Unidades monetarias") +
+  tema
 
 
-#Cálculo de la ganancia promedio y los intervalos
+# Cálculo de la ganancia promedio y los intervalos
 
 Media_upper = round(mean(Exitos_upper_totales$x),2)
 
 Q_upper = sort(Exitos_upper_totales$x)
 
-Q_upper_int = c(mean(Q_upper[25], Q_upper[26]), mean(Q_upper[975], Q_upper[976]))
+Q_upper_int = c(mean(Q_upper[25],
+                     Q_upper[26]),
+                mean(Q_upper[975],
+                     Q_upper[976]))
 
 ```
 
@@ -2230,98 +2297,153 @@ set.seed(69)
 
 datos_thompson_dia = actualizar(366, 1,"thompson")
 
-#Gráfico de la elección diaria de máquina
+# Gráfico de la elección diaria de máquina
 
-plot1_thompson_dia = ggplot(datos_thompson_dia)+
-  geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1"))+
-  geom_line(aes(x = Dia, y = Maquina2Total, colour = "Maquina 2"))+
-  geom_line(aes(x = Dia, y = Maquina3Total, colour = "Maquina 3"))+
-  tema+
-  scale_y_continuous(name = "Cantidad de veces jugadas", breaks = seq(0, 280, 40), limits = c(0, 280))+
+plot1_thompson_dia = ggplot(datos_thompson_dia) +
+  geom_line(aes(x = Dia, y = Maquina1Total, colour = "Maquina 1")) +
+  geom_line(aes(x = Dia, y = Maquina2Total, colour = "Maquina 2")) +
+  geom_line(aes(x = Dia, y = Maquina3Total, colour = "Maquina 3")) +
+  tema +
+  scale_y_continuous(name = "Cantidad de veces jugadas",
+                     breaks = seq(0, 280, 40),
+                     limits = c(0, 280)) +
   scale_x_continuous(name="Dias",breaks = seq(0, 366, 61)) +
-  scale_color_discrete(breaks=c("Maquina 1", "Maquina 2", "Maquina 3"),type = c("purple", "green","blue"), name = "")+
-  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))+
-  theme(legend.position = c(.25,.85), legend.background = element_blank(), legend.key = element_blank())
+  scale_color_discrete(breaks=c("Maquina 1", "Maquina 2", "Maquina 3"),
+                       type = c("purple", "green","blue"), name = "") +
+  theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm")) +
+  theme(legend.position = c(.25,.85),
+        legend.background = element_blank(),
+        legend.key = element_blank())
 
-#Gráfico de la ganancia diaria
+# Gráfico de la ganancia diaria
 
-plot2_thompson_dia = ggplot(datos_thompson_dia)+
-  geom_line(aes(x = Dia, y = Maquina1 + Maquina2 + Maquina3), color = "red")+
-  scale_y_continuous(name="Unidades monetarias ganadas", breaks = c(seq(0, 240, 30)), limits = c(0, 240))+
-  scale_x_continuous(name="Dias", breaks = seq(0, 366, 61))+tema+
+plot2_thompson_dia = ggplot(datos_thompson_dia) +
+  geom_line(aes(x = Dia,
+                y = Maquina1 + Maquina2 + Maquina3),
+            color = "red") +
+  scale_y_continuous(name="Unidades monetarias ganadas",
+                     breaks = c(seq(0, 240, 30)),
+                     limits = c(0, 240)) +
+  scale_x_continuous(name="Dias", breaks = seq(0, 366, 61)) + 
+  tema +
   theme(plot.margin = margin(1.5, .3, 1.5, .3, "cm"))
 
 #Unión de los dos gráficos
 
 grid.arrange(plot1_thompson_dia, plot2_thompson_dia, ncol = 2)
 
-#Generación de las curvas de las binomiales para los días seleccionados
+# Generación de las curvas de las binomiales para los días seleccionados
 
 set.seed(69)
 datos_thompson_post = matrix(seq(0,1,.001), nrow = 3003)
-datos_thompson_post = cbind(datos_thompson_post, dbeta(seq(0, 1, .001), 2, 2))
+datos_thompson_post = cbind(datos_thompson_post,
+                            dbeta(seq(0, 1, .001), 2, 2))
 Maquina1_thompson = matrix(nrow = 1001, ncol = 6)
 Maquina2_thompson = matrix(nrow = 1001, ncol = 6)
 Maquina3_thompson = matrix(nrow = 1001, ncol = 6)
 
 for (i in 1:6) {
-  Maquina1_thompson[,i] = matrix(dbeta(seq(0, 1, .001), 2 + datos_thompson_dia$Maquina1[61*i], 2-datos_thompson_dia$Maquina1[61*i]+datos_thompson_dia$Maquina1Total[61*i]))
-  Maquina2_thompson[,i] = matrix(dbeta(seq(0, 1, .001), 2 + datos_thompson_dia$Maquina2[61*i], 2-datos_thompson_dia$Maquina2[61*i]+datos_thompson_dia$Maquina2Total[61*i]))
-  Maquina3_thompson[,i] = matrix(dbeta(seq(0,1,.001), 2+datos_thompson_dia$Maquina3[61*i], 2-datos_thompson_dia$Maquina3[61*i]+datos_thompson_dia$Maquina3Total[61*i]))
-  
+  Maquina1_thompson[,i] = matrix(
+    dbeta(seq(0, 1, .001),
+          2 + datos_thompson_dia$Maquina1[61*i],
+          2 - datos_thompson_dia$Maquina1[61*i] + 
+          datos_thompson_dia$Maquina1Total[61*i])
+    )
+  Maquina2_thompson[,i] = matrix(
+    dbeta(seq(0, 1, .001),
+          2 + datos_thompson_dia$Maquina2[61*i],
+          2-  datos_thompson_dia$Maquina2[61*i] + 
+          datos_thompson_dia$Maquina2Total[61*i])
+    )
+  Maquina3_thompson[,i] = matrix(
+    dbeta(seq(0,1,.001),
+          2 + datos_thompson_dia$Maquina3[61*i],
+          2-datos_thompson_dia$Maquina3[61*i] + 
+          datos_thompson_dia$Maquina3Total[61*i])
+    )
 }
-Maquinas_thompson = as.data.frame(rbind(Maquina1_thompson, Maquina2_thompson, Maquina3_thompson))
-Maquinas_thompson = cbind(Maquinas_thompson, matrix(rep(c("Maquina 1", "Maquina 2", "Maquina 3"), each = 1001), nrow = 3003,ncol = 1))
-datos_thompson_post = cbind(datos_thompson_post, Maquinas_thompson)
-colnames(datos_thompson_post) = c("seq","Dia0", "Dia61", "Dia122", "Dia183", "Dia244", "Dia305", "Dia366","Maquina")
+Maquinas_thompson = as.data.frame(rbind(Maquina1_thompson,
+                                        Maquina2_thompson,
+                                        Maquina3_thompson))
+Maquinas_thompson = cbind(Maquinas_thompson,
+                          matrix(rep(c("Maquina 1", "Maquina 2",
+                                       "Maquina 3"),
+                                     each = 1001),
+                                 nrow = 3003,
+                                 ncol = 1))
+datos_thompson_post = cbind(datos_thompson_post,
+                            Maquinas_thompson)
+colnames(datos_thompson_post) = c("seq","Dia0",
+                                  "Dia61", "Dia122",
+                                  "Dia183", "Dia244",
+                                  "Dia305", "Dia366","Maquina")
 
-#Gráfico de las distribuciones a posteriori para cada día
+# Gráfico de las distribuciones a posteriori para cada día
 
-plot3_thompson_dia = ggplot(datos_thompson_post, aes(col = factor(Maquina))) +
-  geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0"))+
-  geom_line(aes(x = seq, y = Dia61,color = "Dia 61"))+
-  geom_line(aes(x = seq, y = Dia122,color = "Dia 122"))+
-  geom_line(aes(x = seq, y = Dia183,color = "Dia 183"))+
-  geom_line(aes(x = seq, y = Dia244,color = "Dia 244"))+
-  geom_line(aes(x = seq, y = Dia305,color = "Dia 305"))+
-  geom_line(aes(x = seq, y = Dia366, color ="Dia 366"))+
-  facet_grid(~ Maquina)+
-  tema+
-  scale_y_continuous(name = "Densidad")+
-  theme(axis.ticks.y = element_blank(), axis.text.y = element_blank())+
-  scale_x_continuous(name = "Probabilidad de éxito", breaks = seq(0,1,.25)) +
-  scale_color_discrete(breaks=c("Dia 0", "Dia 244", "Dia 61", "Dia 305", "Dia 122", "Dia 366", "Dia 183"), type = colores, name = "")+
-  theme(legend.background = element_blank(), legend.key.height = unit(.1, "cm"), plot.margin = margin(1,.01,1,.01, "cm"), legend.position = "top")+
-  theme(axis.title.x = element_text(size = 10), axis.title.y = element_text(size = 10), axis.text.x = element_text(size = 6))
+plot3_thompson_dia = ggplot(datos_thompson_post,
+                            aes(col = factor(Maquina))) +
+  geom_line(aes(x = seq, y = Dia0 ,color = "Dia 0")) +
+  geom_line(aes(x = seq, y = Dia61,color = "Dia 61")) +
+  geom_line(aes(x = seq, y = Dia122,color = "Dia 122")) +
+  geom_line(aes(x = seq, y = Dia183,color = "Dia 183")) +
+  geom_line(aes(x = seq, y = Dia244,color = "Dia 244")) +
+  geom_line(aes(x = seq, y = Dia305,color = "Dia 305")) +
+  geom_line(aes(x = seq, y = Dia366, color ="Dia 366")) +
+  facet_grid(~ Maquina) +
+  tema +
+  scale_y_continuous(name = "Densidad") +
+  theme(axis.ticks.y = element_blank(),
+        axis.text.y = element_blank()) +
+  scale_x_continuous(name = "Probabilidad de éxito",
+                     breaks = seq(0,1,.25)) +
+  scale_color_discrete(breaks=c("Dia 0", "Dia 244",
+                                "Dia 61", "Dia 305",
+                                "Dia 122", "Dia 366",
+                                "Dia 183"),
+                       type = colores, name = "") +
+  theme(legend.background = element_blank(),
+        legend.key.height = unit(.1, "cm"),
+        plot.margin = margin(1,.01,1,.01, "cm"), 
+        legend.position = "top") +
+  theme(axis.title.x = element_text(size = 10),
+        axis.title.y = element_text(size = 10),
+        axis.text.x = element_text(size = 6))
 
 plot3_thompson_dia
 
-#Generación de 1000 años
+# Generación de 1000 años
 
 set.seed(69)
 
 datos_thompson_año = actualizar(366, 1000, "thompson")
 
-#Obtención de la ganancia total al final de cada año
+# Obtención de la ganancia total al final de cada año
 
 datos_thompson_filter = filter(datos_thompson_año, Dia == 366)
 
-Exitos_thompson_totales = as.data.frame(rowSums(datos_thompson_filter[, 3:5]))
+Exitos_thompson_totales = as.data.frame(
+  rowSums(datos_thompson_filter[, 3:5])
+  )
 colnames(Exitos_thompson_totales) = "x"
 
-#Histograma de las ganancias promedio para los años
+# Histograma de las ganancias promedio para los años
 
-ggplot(Exitos_thompson_totales, aes(x))+geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
-  scale_y_continuous(expand = expand_scale(add = c(0, 0)), name = "Frecuencia absoluta", limits = c(0, 175), breaks = seq(0, 175, 25)) +
-  scale_x_continuous(breaks = seq(108,220,8), name = "Unidades monetarias")+ tema
+ggplot(Exitos_thompson_totales, aes(x)) + 
+  geom_histogram(fill = "#FF8F54", color = "black", binwidth = 4) +
+  scale_y_continuous(expand = expand_scale(add = c(0, 0)),
+                     name = "Frecuencia absoluta", limits = c(0, 175),
+                     breaks = seq(0, 175, 25)) +
+  scale_x_continuous(breaks = seq(108,220,8),
+                     name = "Unidades monetarias") + tema
 
-#Cálculo de la ganancia promedio y los intervalos
+# Cálculo de la ganancia promedio y los intervalos
 
-Media_thompson = round(mean(Exitos_thompson_totales$x),2)
+Media_thompson = round(mean(Exitos_thompson_totales$x), 2)
 
 Q_thompson = sort(Exitos_thompson_totales$x)
 
-Q_thompson_int = c(mean(Q_thompson[25], Q_thompson[26]), mean(Q_thompson[975], Q_thompson[976]))
+Q_thompson_int = c(mean(Q_thompson[25], Q_thompson[26]),
+                   mean(Q_thompson[975], Q_thompson[976]))
 ```
 
 
