@@ -1749,7 +1749,8 @@ ggplot(Exitos_greedy_posterior_totales, aes(x)) +
 
 #Cálculo de la ganancia promedio y los intervalos
 
-Media_greedy_posterior = round(mean(Exitos_greedy_posterior_totales$x),2)
+Media_greedy_posterior =
+  round(mean(Exitos_greedy_posterior_totales$x),2)
 
 Q_greedy_posterior = sort(Exitos_greedy_posterior_totales$x)
 
