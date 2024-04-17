@@ -6,51 +6,53 @@ header-includes:
   - \usepackage{hyperref}
 ---
 
+
 \Centering
 
 \vspace{3cm}
+
 
 \pagenumbering{gobble}
 
 \vspace{5cm}
 
 \large
-
 LICENCIATURA EN ESTADÍSTICA
 
 \vspace{1cm}
 
-```{=tex}
 \large
 \Huge
-```
-"Análisis de distintas estrategias en el problema Multi-armed Bandit con estadística bayesiana" \Huge \newline \vspace{0.3cm}
+"Análisis de distintas estrategias en el problema Multi-armed Bandit con estadística bayesiana"
+\Huge
+\newline
+\vspace{0.3cm}
 
 \normalsize
-
 Trabajo Práctico 1
-
-\vspace{10cm}
-
+\vspace{1cm}
+\begin{center}
+    \includegraphics[width=.5\linewidth]{imagen.jpg}
+\end{center}
+\vspace{2cm}
 Autores: Tomás Anderson - Alejo Vaschetti - Manuel Moresi
 
 Docentes: Ignacio Evangelista - Tomás Capretto
 
-17/04/2024 \normalsize
+17/04/2024
+\normalsize
 
-```{=tex}
 \newpage
 \hypersetup{linkcolor = black}
 \tableofcontents
-```
-```{=tex}
+
+
 \newpage
 \pagenumbering{arabic}
-```
-```{=tex}
+
 \RaggedRight
 \newpage
-```
+
 # Introduccion
 
 El humano tiene que enfrentarse a una gran cantidad de decisiones en su vida diaria. Algunas pueden ser irrelevantes, como la elección de para qué lado dormirse o cuál es el primer pie al que se le pone la media al vestirse. En cambio, otros dilemas pueden ser de una importancia superior en la que se espera un mayor uso de racionalidad. Por ejemplo, al terminar la escuela, ¿empezar a trabajar o estudiar?, ¿qué carrera seguir?, ¿salir de fiesta con tanta lluvia el fin de semana?. Estos problemas de decisión que conllevan un poco más de esfuerzo pueden ser analizados de forma dicotómica, basar la elección en base a la seguridad de lo familiar y el conocimiento previo o decantarse por lo desconocido y arriesgado pero con posibles recompensas mayores. Usando los ejemplos anteriores, ¿seguir una carrera que se adecúe a las técnicas propias o elegir una carrera de conocimientos inexplorados?, ¿quedarse en casa viendo una serie o salir de fiesta pudiendo ser una noche inolvidable o una desastrosa?. Este dilema se lo conoce como "explorar vs. explotar" en el cual el primero hace referencia a la promesa de lo desconocido y lo segundo a la seguridad de lo familiar.
